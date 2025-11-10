@@ -1,0 +1,82 @@
+<?php
+
+use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
+use App\Http\Controllers\MemberRegistrationController;
+use App\Http\Controllers\ContributionController;
+use App\Models\MembershipType;
+
+
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you register web routes for your application.
+| Each route returns an Inertia view or calls a controller method.
+|
+*/
+
+/**
+ * ------------------------------------------------------------
+ * 🌍 PUBLIC LANDING / HOMEPAGE
+ * ------------------------------------------------------------
+ * You can keep this simple or redirect to registration.
+ */
+Route::get('/', fn () => Inertia::render('RegisterMember'))
+    ->name('home');
+
+
+
+/**
+ * ------------------------------------------------------------
+ * 🧾 MEMBER REGISTRATION FLOW
+ * ------------------------------------------------------------
+ * New members can register and immediately pay via Paystack.
+ */
+Route::post('/register-member', [MemberRegistrationController::class, 'store'])
+    ->name('register.member');
+
+Route::get('/payment/callback', [MemberRegistrationController::class, 'callback'])
+    ->name('member.payment.callback');
+
+Route::post('/payment/webhook', [MemberRegistrationController::class, 'handleWebhook'])
+    ->name('member.payment.webhook');
+
+
+
+/**
+ * ------------------------------------------------------------
+ * 🎁 OPTIONAL: GENERAL CONTRIBUTION FLOW
+ * ------------------------------------------------------------
+ * Keep this if you also accept one-time donations
+ * without requiring registration.
+ */
+Route::get('/contribute', [ContributionController::class, 'index'])
+    ->name('contribute.page');
+
+Route::post('/contribute', [ContributionController::class, 'store'])
+    ->name('contribute.store');
+
+
+
+/**
+ * ------------------------------------------------------------
+ * 💳 MEMBERSHIP TYPES ENDPOINT
+ * ------------------------------------------------------------
+ * Used by your Vue form to populate the membership dropdown.
+ * Returns all active membership plans (Basic, Premium, Gold, etc.).
+ */
+Route::get('/membership-types', function () {
+    return response()->json([
+        'data' => MembershipType::select('id', 'name', 'amount')->orderBy('amount')->get(),
+    ]);
+})->name('membership.types');
+
+/**
+ * ------------------------------------------------------------
+ * ⚙️ SYSTEM / TEST ROUTES (optional)
+ * ------------------------------------------------------------
+ * For example, a simple health check route for server testing.
+ */
+Route::get('/up', fn () => ['status' => 'ok']);
