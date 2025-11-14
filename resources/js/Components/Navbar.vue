@@ -15,16 +15,16 @@
             <!-- Navigation Links -->
             <div class="flex items-center gap-8 mr-6 font-semibold">
                 <Link 
-                    href="/about" 
+                    href="/" 
                     class="text-[#FFDA9E] transition-colors text-sm"
                 >
                     About Us
                 </Link>
                 <a 
-                    href="/download-thesis"
+                    href="/register"
                     class="text-[#FFDA9E] transition-colors text-sm"
                 >
-                    Download Thesis
+                    Join Today
                 </a>
             </div>
         </div>
