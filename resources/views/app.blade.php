@@ -4,6 +4,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <script src="https://js.paystack.co/v1/inline.js" defer></script>
+
 
     <title inertia>Africa Diaspora Checkout</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -33,5 +35,7 @@
     <div class="relative z-10">
         @inertia
     </div>
+
+    
 </body>
 </html>

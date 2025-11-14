@@ -18,12 +18,12 @@
                 >
                     About Us
                 </Link>
-                <Link 
-                    href="/download-thesis" 
+                <a 
+                    href="/download-thesis"
                     class="text-[#FFDA9E] transition-colors text-sm"
                 >
                     Download Thesis
-                </Link>
+                </a>
             </div>
         </div>
     </nav>
@@ -32,14 +32,10 @@
 <script setup>
 import { Link } from '@inertiajs/vue3';
 import { usePage } from '@inertiajs/vue3';
-import { computed } from 'vue';
 
 const page = usePage();
-
-// Public folder assets are served directly at the root
 const logoUrl = '/navbar-logo.png';
 
-// Check if the current route is active
 const isActive = (path) => {
     return page.url === path;
 };

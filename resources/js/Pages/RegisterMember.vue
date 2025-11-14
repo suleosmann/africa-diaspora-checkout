@@ -103,22 +103,15 @@
           <p v-if="form.errors.email" class="text-red-600 text-sm mt-1">{{ form.errors.email }}</p>
         </div>
 
-        <!-- Membership Type -->
-        <div>
-          <label class="block text-sm font-semibold text-gray-900 mb-2">Membership Type</label>
-          <select
-            v-model="form.membership_type_id"
-            class="w-full rounded-lg border-0 bg-white shadow-sm py-3 px-4 text-gray-900 focus:ring-2 focus:ring-yellow-400"
-            required
-          >
-            <option value="">Select membership type</option>
-            <option v-for="type in membershipTypes" :key="type.id" :value="type.id">
-              {{ type.name }} - USD {{ type.amount }}
-            </option>
-          </select>
-          <p v-if="form.errors.membership_type_id" class="text-red-600 text-sm mt-1">
-            {{ form.errors.membership_type_id }}
-          </p>
+        <!-- Membership Type Info -->
+        <div class="bg-[#FFDA9E] rounded-lg p-4 border-2 border-[#3D2817]">
+          <div class="flex justify-between items-center">
+            <div>
+              <p class="font-bold text-[#3D2817] text-lg">Premier Membership</p>
+              <p class="text-sm text-gray-700">Annual subscription</p>
+            </div>
+            <p class="font-bold text-[#3D2817] text-2xl">$350</p>
+          </div>
         </div>
 
         <!-- Terms -->
@@ -143,7 +136,7 @@
           :disabled="form.processing"
           class="w-full bg-[#3D2817] hover:bg-[#2a1d13] text-white font-semibold py-3 rounded-lg transition disabled:opacity-50"
         >
-          {{ form.processing ? 'Processing...' : 'Proceed' }}
+          {{ form.processing ? 'Processing...' : 'Proceed to Payment' }}
         </button>
 
         <p class="text-center text-sm text-gray-900 mt-4">
@@ -156,12 +149,12 @@
 </template>
 
 <script setup>
-import Navbar from '@/Components/Navbar.vue';
+import Navbar from '@/Components/Navbar.vue'
 import { useForm } from '@inertiajs/vue3'
-import { ref, onMounted } from 'vue'
 import axios from 'axios'
 
-const membershipTypes = ref([])
+
+const PAYSTACK_PUBLIC_KEY = import.meta.env.VITE_PAYSTACK_PUBLIC_KEY
 
 const form = useForm({
   name: '',
@@ -169,38 +162,59 @@ const form = useForm({
   email: '',
   industry: '',
   region: '',
-  membership_type_id: '',
   agree: false,
 })
 
-onMounted(async () => {
-  try {
-    const response = await axios.get('/membership-types')
-    membershipTypes.value = response.data.data
-  } catch (error) {
-    console.error('Failed to load membership types:', error)
-  }
-})
-
-
 async function submit() {
-  console.log('Submitting form:', form.data())
+  console.log('🟡 Submitting form:', form.data())
+
+  if (!PAYSTACK_PUBLIC_KEY) {
+    alert('⚠️ Paystack key not configured. Please contact support.')
+    return
+  }
+
+  if (!window.PaystackPop) {
+    alert('⚠️ Paystack script not loaded. Please refresh the page.')
+    return
+  }
+
+  form.processing = true
 
   try {
-    // use axios manually instead of Inertia's form.post
+    // 1️⃣ Register member via backend
     const response = await axios.post('/register-member', form.data())
+    const data = response.data
+    console.log('✅ Backend response:', data)
 
-    if (response.data?.redirect_url) {
-      console.log('🌍 Redirecting to:', response.data.redirect_url)
-      window.location.href = response.data.redirect_url
-    } else {
-      console.warn('No redirect URL found in response', response.data)
-    }
+    // 2️⃣ Initialize Paystack popup
+    const handler = window.PaystackPop.setup({
+      key: PAYSTACK_PUBLIC_KEY,
+      email: data.email,
+      amount: parseFloat(data.amount) * 100,
+      currency: 'USD',
+      ref: data.reference,
+      label: 'Aden Africa Membership',
+      metadata: {
+        name: form.name,
+        phone: form.phone,
+        membership: data.membership_name,
+      },
+      callback: (response) => {
+        console.log('✅ Payment success:', response)
+        window.location.href = `/payment/callback?reference=${response.reference}`
+      },
+      onClose: () => {
+        console.log('❌ Payment window closed.')
+        form.processing = false
+      },
+    })
+
+    handler.openIframe()
   } catch (error) {
-    console.error('❌ Registration failed:', error.response?.data || error.message)
-    if (error.response?.data?.error) {
-      alert(error.response.data.error)
-    }
+    console.error('❌ Error:', error.response?.data || error)
+    alert('Something went wrong. Please try again.')
+  } finally {
+    form.processing = false
   }
 }
 </script>

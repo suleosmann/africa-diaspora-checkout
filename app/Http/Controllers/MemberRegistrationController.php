@@ -20,93 +20,57 @@ class MemberRegistrationController extends Controller
      */
     public function store(Request $request)
     {
-        // 1️⃣ Validate input (no 'unique' rule anymore)
         $data = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email'],
             'phone' => ['required', 'string', 'max:20'],
             'industry' => ['nullable', 'string', 'max:255'],
             'region' => ['nullable', 'string', 'max:255'],
-            'membership_type_id' => ['required', 'exists:membership_types,id'],
             'agree' => ['accepted'],
         ]);
 
-        // 2️⃣ Get the membership plan
-        $membership = MembershipType::findOrFail($data['membership_type_id']);
+        // Hardcoded Premier Membership
+        $membershipAmount = 350;
+        $membershipName = 'Premier Membership';
 
-        // 3️⃣ Check if user already exists
-        $member = User::where('email', $data['email'])->first();
-
-        if ($member) {
-            // ✅ Existing user – update optional info if missing
-            $member->update([
-                'phone' => $data['phone'] ?? $member->phone,
-                'industry' => $data['industry'] ?? $member->industry,
-                'region' => $data['region'] ?? $member->region,
-                'membership_type_id' => $membership->id,
-            ]);
-        } else {
-            // ✅ New user
-            $member = User::create([
+        // ✅ Find or create user
+        $member = User::firstOrCreate(
+            ['email' => $data['email']],
+            [
                 'member_uuid' => Str::uuid(),
                 'name' => $data['name'],
-                'email' => $data['email'],
                 'phone' => $data['phone'],
                 'industry' => $data['industry'] ?? null,
                 'region' => $data['region'] ?? null,
-                'membership_type_id' => $membership->id,
                 'password' => bcrypt(Str::random(12)),
-            ]);
-        }
+            ]
+        );
 
-        // 4️⃣ Create new transaction for membership
+        // ✅ Create transaction record
         $reference = 'MBR_' . strtoupper(Str::random(10));
 
         Transaction::create([
             'referenceId' => $reference,
-            'name' => $member->name,
-            'email' => $member->email,
-            'amount' => $membership->amount,
-            'status' => TransactionStatus::PENDING,
-            'remarks' => [
+            'name'        => $member->name,
+            'email'       => $member->email,
+            'amount'      => $membershipAmount,
+            'status'      => TransactionStatus::PENDING,
+            'remarks'     => [
                 'type' => 'membership_fee',
-                'membership' => $membership->name,
+                'membership' => $membershipName,
             ],
         ]);
 
-        // 5️⃣ Initialize Paystack
-        $paystackSecret = config('services.paystack.secret_key');
-        $response = Http::withToken($paystackSecret)
-            ->post('https://api.paystack.co/transaction/initialize', [
-                'email'        => $member->email,
-                'amount'       => $membership->amount * 100, // USD cents
-                'currency'     => 'USD',
-                'reference'    => $reference,
-                'callback_url' => route('member.payment.callback'),
-                'metadata'     => [
-                    'member_uuid'       => $member->member_uuid,
-                    'member_name'       => $member->name,
-                    'membership_type'   => $membership->name,
-                    'membership_amount' => $membership->amount,
-                ],
-                'channels'     => ['card', 'mobile_money', 'bank', 'ussd', 'apple_pay'],
-            ]);
-
-        $body = $response->json();
-
-        // 6️⃣ Handle failures
-        if (! $response->successful() || empty($body['data']['authorization_url'])) {
-            return response()->json([
-                'error' => 'Failed to initialize payment. Please try again.',
-                'details' => $body,
-            ], 422);
-        }
-
-        // ✅ Return redirect URL to frontend
+        // ✅ Return data to frontend
         return response()->json([
-            'redirect_url' => $body['data']['authorization_url'],
+            'reference' => $reference,
+            'email' => $member->email,
+            'amount' => $membershipAmount,
+            'membership_name' => $membershipName,
+            'message' => 'Ready to initialize Paystack inline checkout.'
         ]);
     }
+
 
 
     /**

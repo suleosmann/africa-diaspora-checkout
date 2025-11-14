@@ -17,14 +17,17 @@ use App\Models\MembershipType;
 |
 */
 
+
 /**
  * ------------------------------------------------------------
  * 🌍 PUBLIC LANDING / HOMEPAGE
  * ------------------------------------------------------------
  * You can keep this simple or redirect to registration.
  */
-Route::get('/', fn () => Inertia::render('RegisterMember'))
+Route::get('/', fn () => Inertia::render('LandingPage'))
     ->name('home');
+Route::get('/register', fn () => Inertia::render('RegisterMember'))
+    ->name('register.member.home');
 
 
 
@@ -72,6 +75,19 @@ Route::get('/membership-types', function () {
         'data' => MembershipType::select('id', 'name', 'amount')->orderBy('amount')->get(),
     ]);
 })->name('membership.types');
+
+Route::get('/download-thesis', function () {
+    $filePath = public_path('thesis.pdf');
+    
+    if (!file_exists($filePath)) {
+        abort(404, 'File not found');
+    }
+    
+    return response()->download($filePath, 'ADEN-Thesis.pdf', [
+        'Content-Type' => 'application/pdf',
+        'Content-Disposition' => 'attachment; filename="ADEN-Thesis.pdf"'
+    ]);
+});
 
 /**
  * ------------------------------------------------------------

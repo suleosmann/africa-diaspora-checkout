@@ -70,25 +70,70 @@
 </template>
 
 <script setup>
-import Navbar from '@/Components/Navbar.vue';
-import { useForm } from '@inertiajs/vue3'
+import Navbar from '@/Components/Navbar.vue'
+import { ref, onMounted } from 'vue'
+import axios from 'axios'
 
-const form = useForm({
+const PAYSTACK_PUBLIC_KEY = import.meta.env.VITE_PAYSTACK_PUBLIC_KEY
+console.log('Vite Paystack Key:', import.meta.env.VITE_PAYSTACK_PUBLIC_KEY)
+
+
+const form = ref({
   name: '',
+  phone: '',
   email: '',
-  amount: '',
+  industry: '',
+  region: '',
+  membership_type_id: '',
+  agree: false,
 })
 
-function submit() {
-  form.post('/contribute', {
-    preserveScroll: true,
-    onSuccess: () => {
-    //   form.reset()
-    },
-    onError: (errors) => {
-      console.log('Validation errors:', errors)
-    }
-  })
-}
+const membershipTypes = ref([])
 
+onMounted(async () => {
+  const res = await axios.get('/membership-types')
+  membershipTypes.value = res.data.data
+})
+
+async function submit() {
+  console.log('Submitting form:', form.value)
+
+  try {
+    const response = await axios.post('/register-member', form.value)
+    const data = response.data
+
+    console.log('✅ Backend returned:', data)
+    console.log('🔑 Paystack Key:', PAYSTACK_PUBLIC_KEY)
+
+    if (!window.PaystackPop) {
+      alert('⚠️ Paystack script not loaded. Refresh the page.')
+      return
+    }
+
+    const handler = window.PaystackPop.setup({
+      key: PAYSTACK_PUBLIC_KEY,
+      email: data.email,
+      amount: parseFloat(data.amount) * 100,
+      currency: 'USD',
+      ref: data.reference,
+      label: 'Aden Africa Membership',
+      metadata: {
+        name: form.value.name,
+        phone: form.value.phone,
+        membership: data.membership_name,
+      },
+      callback: (response) => {
+        console.log('✅ Payment success:', response)
+        window.location.href = `/payment/callback?reference=${response.reference}`
+      },
+      onClose: () => {
+        console.log('❌ Payment window closed')
+      },
+    })
+
+    handler.openIframe()
+  } catch (err) {
+    console.error('❌ Error:', err.response?.data || err)
+  }
+}
 </script>
