@@ -1,5 +1,6 @@
 <template>
   <div class="relative min-h-[70vh] bg-[#F5F1E8]">
+    <div style="background-image: url('/belowheader.png');" class="mt-24 h-20"></div>
     <!-- Background Pattern - Right Side -->
     <div class="fixed top-0 right-0 w-1/2 h-full pointer-events-none z-0 overflow-hidden">
         <img 

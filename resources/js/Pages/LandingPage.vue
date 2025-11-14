@@ -27,9 +27,11 @@
           Download the ADEN Thesis
         </a>
       </div>
+      
     </div>
+  
     <!-- Video Section Component -->
-     <div class="mt-24">
+     <div class="">
       <VideoSection/>
      </div>
      <div>

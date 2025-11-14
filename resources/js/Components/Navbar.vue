@@ -3,11 +3,13 @@
         <div class="flex items-center justify-between">
             <!-- Logo Section -->
             <div class="flex items-center gap-3">
+                <a href="/">
                 <img 
                     :src="logoUrl" 
                     alt="ADEN Logo" 
                     class="h-10 w-auto"
                 >
+                </a>
             </div>
 
             <!-- Navigation Links -->

@@ -22,7 +22,7 @@
                 v-model="form.name"
                 type="text"
                 placeholder="Enter your full name"
-                class="w-full rounded-lg border-0 bg-white shadow-sm py-3 px-4 pr-10 text-gray-900 placeholder:text-gray-400 focus:ring-2 focus:ring-yellow-400"
+                class="w-full rounded-lg border-0 bg-white shadow-sm py-3 px-4 pr-10 text-gray-900 placeholder:text-gray-400 focus:ring-2 focus:ring-[#FFDA9E]"
                 required
               />
               <span class="absolute inset-y-0 right-3 flex items-center text-gray-900">
@@ -40,7 +40,7 @@
                 v-model="form.phone"
                 type="text"
                 placeholder="Enter phone number"
-                class="w-full rounded-lg border-0 bg-white shadow-sm py-3 px-4 pr-10 text-gray-900 placeholder:text-gray-400 focus:ring-2 focus:ring-yellow-400"
+                class="w-full rounded-lg border-0 bg-white shadow-sm py-3 px-4 pr-10 text-gray-900 placeholder:text-gray-400 focus:ring-2 focus:ring-[#FFDA9E]"
                 required
               />
               <span class="absolute inset-y-0 right-3 flex items-center text-gray-900">
@@ -60,7 +60,7 @@
                 v-model="form.industry"
                 type="text"
                 placeholder="Industry Affiliation"
-                class="w-full rounded-lg border-0 bg-white shadow-sm py-3 px-4 pr-10 text-gray-900 placeholder:text-gray-400 focus:ring-2 focus:ring-yellow-400"
+                class="w-full rounded-lg border-0 bg-white shadow-sm py-3 px-4 pr-10 text-gray-900 placeholder:text-gray-400 focus:ring-2 focus:ring-[#FFDA9E]"
               />
               <span class="absolute inset-y-0 right-3 flex items-center text-gray-900">
                 <i class="fa fa-briefcase"></i>
@@ -68,19 +68,36 @@
             </div>
           </div>
 
-          <!-- Region -->
-          <div>
-            <label class="block text-sm font-semibold text-gray-900 mb-2">Region</label>
+          <!-- Country Searchable Dropdown -->
+          <div class="relative">
+            <label class="block text-sm font-semibold text-gray-900 mb-2">Country</label>
             <div class="relative">
               <input
-                v-model="form.region"
+                v-model="searchQuery"
+                @focus="showDropdown = true"
+                @blur="hideDropdown"
                 type="text"
-                placeholder="Region"
-                class="w-full rounded-lg border-0 bg-white shadow-sm py-3 px-4 pr-10 text-gray-900 placeholder:text-gray-400 focus:ring-2 focus:ring-yellow-400"
+                placeholder="Search country..."
+                class="w-full rounded-lg border-0 bg-white shadow-sm py-3 px-4 pr-10 text-gray-900 placeholder:text-gray-400 focus:ring-2 focus:ring-[#FFDA9E]"
               />
-              <span class="absolute inset-y-0 right-3 flex items-center text-gray-900">
-                <i class="fa fa-map-marker-alt"></i>
+              <span class="absolute inset-y-0 right-3 flex items-center text-gray-900 pointer-events-none">
+                <i class="fa fa-chevron-down"></i>
               </span>
+              
+              <!-- Dropdown -->
+              <div 
+                v-if="showDropdown && filteredCountries.length > 0"
+                class="absolute z-50 w-full mt-1 bg-white rounded-lg shadow-lg max-h-60 overflow-y-auto border border-gray-200"
+              >
+                <div
+                  v-for="country in filteredCountries"
+                  :key="country"
+                  @mousedown="selectCountry(country)"
+                  class="px-4 py-2 hover:bg-[#FFDA9E] cursor-pointer text-gray-900"
+                >
+                  {{ country }}
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -93,7 +110,7 @@
               v-model="form.email"
               type="email"
               placeholder="Enter your email address"
-              class="w-full rounded-lg border-0 bg-white shadow-sm py-3 px-4 pr-10 text-gray-900 placeholder:text-gray-400 focus:ring-2 focus:ring-yellow-400"
+              class="w-full rounded-lg border-0 bg-white shadow-sm py-3 px-4 pr-10 text-gray-900 placeholder:text-gray-400 focus:ring-2 focus:ring-[#FFDA9E]"
               required
             />
             <span class="absolute inset-y-0 right-3 flex items-center text-gray-900">
@@ -121,12 +138,12 @@
             v-model="form.agree" 
             type="checkbox" 
             required 
-            class="mt-1 rounded border-gray-300 text-blue-600 focus:ring-blue-500" 
+            class="mt-1 rounded border-gray-300 text-[#3D2817] focus:ring-[#FFDA9E]" 
           />
           <label for="agree" class="text-sm text-gray-900">
             I agree to the
-            <a href="#" class="text-blue-600 hover:underline">Terms & Conditions</a> and
-            <a href="#" class="text-blue-600 hover:underline">Privacy Policy</a>
+            <a href="#" class="text-[#3D2817] hover:underline font-semibold">Terms & Conditions</a> and
+            <a href="#" class="text-[#3D2817] hover:underline font-semibold">Privacy Policy</a>
           </label>
         </div>
 
@@ -139,10 +156,10 @@
           {{ form.processing ? 'Processing...' : 'Proceed to Payment' }}
         </button>
 
-        <p class="text-center text-sm text-gray-900 mt-4">
+        <!-- <p class="text-center text-sm text-gray-900 mt-4">
           Already have an account?
-          <a href="/login" class="text-blue-600 hover:underline">Sign in here</a>
-        </p>
+          <a href="/login" class="text-[#3D2817] hover:underline font-semibold">Sign in here</a>
+        </p> -->
       </form>
     </div>
   </div>
@@ -152,9 +169,39 @@
 import Navbar from '@/Components/Navbar.vue'
 import { useForm } from '@inertiajs/vue3'
 import axios from 'axios'
-
+import { ref, computed, onMounted } from 'vue'
 
 const PAYSTACK_PUBLIC_KEY = import.meta.env.VITE_PAYSTACK_PUBLIC_KEY
+
+const countries = ref([])
+const searchQuery = ref('')
+const showDropdown = ref(false)
+
+onMounted(async () => {
+  const worldCountries = await import('world-countries')
+  countries.value = worldCountries.default
+    .map(country => country.name.common)
+    .sort()
+})
+
+const filteredCountries = computed(() => {
+  if (!searchQuery.value) return countries.value
+  return countries.value.filter(country => 
+    country.toLowerCase().includes(searchQuery.value.toLowerCase())
+  )
+})
+
+const selectCountry = (country) => {
+  form.region = country
+  searchQuery.value = country
+  showDropdown.value = false
+}
+
+const hideDropdown = () => {
+  setTimeout(() => {
+    showDropdown.value = false
+  }, 200)
+}
 
 const form = useForm({
   name: '',
@@ -181,12 +228,10 @@ async function submit() {
   form.processing = true
 
   try {
-    // 1️⃣ Register member via backend
     const response = await axios.post('/register-member', form.data())
     const data = response.data
     console.log('✅ Backend response:', data)
 
-    // 2️⃣ Initialize Paystack popup
     const handler = window.PaystackPop.setup({
       key: PAYSTACK_PUBLIC_KEY,
       email: data.email,
