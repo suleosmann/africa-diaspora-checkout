@@ -15,9 +15,6 @@ use Illuminate\Support\Facades\Log;
 
 class MemberRegistrationController extends Controller
 {
-    /**
-     * ✅ Handle new member registration and initiate payment
-     */
     public function store(Request $request)
     {
         $data = $request->validate([
@@ -29,11 +26,9 @@ class MemberRegistrationController extends Controller
             'agree' => ['accepted'],
         ]);
 
-        // Hardcoded Premier Membership
         $membershipAmount = 1;
         $membershipName = 'Premier Membership';
 
-        // ✅ Find or create user
         $member = User::firstOrCreate(
             ['email' => $data['email']],
             [
@@ -46,7 +41,6 @@ class MemberRegistrationController extends Controller
             ]
         );
 
-        // ✅ Create transaction record
         $reference = 'MBR_' . strtoupper(Str::random(10));
 
         Transaction::create([
@@ -61,26 +55,134 @@ class MemberRegistrationController extends Controller
             ],
         ]);
 
-        // ✅ Return data to frontend
         return response()->json([
             'reference' => $reference,
             'email' => $member->email,
             'amount' => $membershipAmount,
             'membership_name' => $membershipName,
-            'message' => 'Ready to initialize Paystack inline checkout.'
+            'message' => 'Ready to initialize payment.'
         ]);
     }
 
+    public function showPaymentPage($reference)
+    {
+        $transaction = Transaction::where('referenceId', $reference)->firstOrFail();
 
+        return Inertia::render('Payment/Checkout', [
+            'reference' => $reference,
+            'email' => $transaction->email,
+            'amount' => $transaction->amount,
+            'membership' => $transaction->remarks['membership'] ?? 'Membership Fee',
+        ]);
+    }
 
-    /**
-     * ✅ Handle Paystack callback
-     */
+    public function charge(Request $request)
+    {
+        $paystackSecret = config('services.paystack.secret_key');
+
+        $payload = [
+            'email'     => $request->email,
+            'amount'    => $request->amount,
+            'reference' => $request->reference,
+            'card'      => [
+                'number'        => $request->card['number'],
+                'cvv'           => $request->card['cvv'],
+                'expiry_month'  => $request->card['month'],
+                'expiry_year'   => $request->card['year'],
+            ]
+        ];
+
+        Log::info('Paystack charge request', ['payload' => $payload]);
+
+        try {
+            $response = Http::withToken($paystackSecret)
+                ->post("https://api.paystack.co/charge", $payload);
+
+            $data = $response->json();
+            Log::info('Paystack charge response', $data);
+
+            // Store the reference for OTP/3DS follow-up
+            if (isset($data['data']['reference'])) {
+                session(['paystack_reference' => $data['data']['reference']]);
+            }
+
+            return response()->json($data);
+
+        } catch (\Exception $e) {
+            Log::error('Paystack error', ['error' => $e->getMessage()]);
+            return response()->json([
+                'status' => false,
+                'message' => 'Payment processing failed'
+            ], 500);
+        }
+    }
+
+    public function submitOtp(Request $request)
+    {
+        $paystackSecret = config('services.paystack.secret_key');
+
+        $payload = [
+            'otp' => $request->otp,
+            'reference' => session('paystack_reference') // Get from session
+        ];
+
+        Log::info('OTP submission', $payload);
+
+        try {
+            $response = Http::withToken($paystackSecret)
+                ->post("https://api.paystack.co/charge/submit_otp", $payload);
+
+            $data = $response->json();
+            Log::info('OTP response', $data);
+
+            return response()->json($data);
+
+        } catch (\Exception $e) {
+            Log::error('OTP error', ['error' => $e->getMessage()]);
+            return response()->json([
+                'status' => false,
+                'message' => 'OTP verification failed'
+            ], 500);
+        }
+    }
+
+    public function checkStatus($reference)
+    {
+        $paystackSecret = config('services.paystack.secret_key');
+
+        try {
+            $response = Http::withToken($paystackSecret)
+                ->get("https://api.paystack.co/transaction/verify/{$reference}");
+
+            $data = $response->json();
+            
+            if ($data['status'] && $data['data']['status'] === 'success') {
+                // Update transaction
+                Transaction::where('referenceId', $reference)->update([
+                    'status' => TransactionStatus::SUCCESS,
+                    'verified_at' => now(),
+                ]);
+            }
+
+            return response()->json([
+                'status' => $data['data']['status'] ?? 'pending',
+                'message' => $data['message'] ?? ''
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Status check error', ['error' => $e->getMessage()]);
+            return response()->json([
+                'status' => 'pending',
+                'message' => 'Unable to verify status'
+            ]);
+        }
+    }
+
     public function callback(Request $request)
     {
         $reference = $request->query('reference');
 
-        if (! $reference) {
+        if (!$reference) {
             return Inertia::render('PaymentFailed', [
                 'message' => 'No transaction reference provided.',
             ]);
@@ -88,13 +190,12 @@ class MemberRegistrationController extends Controller
 
         $paystackSecret = config('services.paystack.secret_key');
 
-        // Verify transaction with Paystack
         $verify = Http::withToken($paystackSecret)
             ->get("https://api.paystack.co/transaction/verify/{$reference}");
 
-        if (! $verify->successful()) {
+        if (!$verify->successful()) {
             return Inertia::render('PaymentFailed', [
-                'message' => 'Unable to verify transaction. Please try again later.',
+                'message' => 'Unable to verify transaction.',
             ]);
         }
 
@@ -121,8 +222,7 @@ class MemberRegistrationController extends Controller
             'status'  => TransactionStatus::FAILED,
             'remarks' => [
                 'gateway'       => 'Paystack',
-                'verified_via'  => 'callback',
-                'error'         => 'Transaction failed or was cancelled',
+                'error'         => 'Transaction failed',
             ],
         ]);
 
@@ -131,34 +231,29 @@ class MemberRegistrationController extends Controller
         ]);
     }
 
-    /**
-     * ✅ Handle Paystack Webhook (optional)
-     */
     public function handleWebhook(Request $request)
     {
         $payload   = $request->getContent();
         $signature = $request->header('x-paystack-signature');
         $secret    = config('services.paystack.secret_key');
 
-        // Verify webhook authenticity
         if (hash_hmac('sha512', $payload, $secret) !== $signature) {
             abort(403, 'Invalid signature');
         }
 
         $data = json_decode($payload, true)['data'] ?? null;
 
-        if (! $data) {
+        if (!$data) {
             return response()->json(['status' => 'no data']);
         }
 
         $reference = $data['reference'] ?? null;
         $status    = $data['status'] ?? null;
 
-        if (! $reference || ! $status) {
+        if (!$reference || !$status) {
             return response()->json(['status' => 'missing reference']);
         }
 
-        // Update transaction
         Transaction::where('referenceId', $reference)->update([
             'status'      => $status === 'success'
                 ? TransactionStatus::SUCCESS
@@ -169,51 +264,4 @@ class MemberRegistrationController extends Controller
 
         return response()->json(['status' => 'ok']);
     }
-    public function showPaymentPage($reference)
-{
-    $transaction = Transaction::where('referenceId', $reference)->firstOrFail();
-
-    return Inertia::render('Payment/Checkout', [
-        'reference' => $reference,
-        'email' => $transaction->email,
-        'amount' => $transaction->amount,
-        'membership' => $transaction->remarks['membership'] ?? 'Membership Fee',
-    ]);
-}
-
-public function charge(Request $request)
-{
-    $paystackSecret = config('services.paystack.secret_key');
-
-    $payload = [
-        'email'     => $request->email,
-        'amount'    => $request->amount, // Already in kobo from frontend
-        'reference' => $request->reference, // Include reference
-        'card'      => [
-            'number'        => $request->card['number'],
-            'cvv'           => $request->card['cvv'],
-            'expiry_month'  => $request->card['month'],
-            'expiry_year'   => $request->card['year'],
-        ]
-    ];
-
-    Log::info('Paystack charge request', $payload);
-
-    try {
-        $response = Http::withToken($paystackSecret)
-            ->post("https://api.paystack.co/charge", $payload);
-
-        Log::info('Paystack response', $response->json());
-
-        return $response->json();
-    } catch (\Exception $e) {
-        Log::error('Paystack error', ['error' => $e->getMessage()]);
-        return response()->json([
-            'status' => false,
-            'message' => 'Payment processing failed'
-        ], 500);
-    }
-}
-
-
 }

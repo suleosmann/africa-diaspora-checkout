@@ -95,6 +95,15 @@ Route::get('/download-thesis', function () {
     ]);
 });
 
+Route::post('/paystack/charge', [MemberRegistrationController::class, 'charge'])
+    ->name('paystack.charge');
+
+Route::post('/paystack/submit-otp', [MemberRegistrationController::class, 'submitOtp'])
+    ->name('paystack.submit.otp');
+
+Route::get('/paystack/check-status/{reference}', [MemberRegistrationController::class, 'checkStatus'])
+    ->name('paystack.check.status');
+
 /**
  * ------------------------------------------------------------
  * ⚙️ SYSTEM / TEST ROUTES (optional)
