@@ -64,6 +64,10 @@ Route::post('/contribute', [ContributionController::class, 'store'])
 Route::get('/payment/{reference}', [MemberRegistrationController::class, 'showPaymentPage'])
     ->name('payment.custom');
 
+Route::post('/paystack/charge', [MemberRegistrationController::class, 'charge'])
+    ->name('paystack.charge');
+
+
 
 /**
  * ------------------------------------------------------------

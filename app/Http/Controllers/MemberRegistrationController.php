@@ -181,4 +181,27 @@ class MemberRegistrationController extends Controller
     ]);
 }
 
+public function charge(Request $request)
+{
+    $paystackSecret = config('services.paystack.secret_key');
+
+    $payload = [
+        'email'  => $request->email,
+        'amount' => $request->amount,
+        'card'   => [
+            'number'        => $request->card['number'],
+            'cvv'           => $request->card['cvv'],
+            'expiry_month'  => $request->card['month'],
+            'expiry_year'   => $request->card['year'],
+        ]
+    ];
+
+    // Call Paystack CHARGE API
+    $response = Http::withToken($paystackSecret)
+        ->post("https://api.paystack.co/charge", $payload);
+
+    return $response->json();
+}
+
+
 }
