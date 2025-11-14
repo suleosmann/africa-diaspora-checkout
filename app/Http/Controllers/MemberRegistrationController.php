@@ -186,9 +186,10 @@ public function charge(Request $request)
     $paystackSecret = config('services.paystack.secret_key');
 
     $payload = [
-        'email'  => $request->email,
-        'amount' => $request->amount,
-        'card'   => [
+        'email'     => $request->email,
+        'amount'    => $request->amount, // Already in kobo from frontend
+        'reference' => $request->reference, // Include reference
+        'card'      => [
             'number'        => $request->card['number'],
             'cvv'           => $request->card['cvv'],
             'expiry_month'  => $request->card['month'],
@@ -196,11 +197,22 @@ public function charge(Request $request)
         ]
     ];
 
-    // Call Paystack CHARGE API
-    $response = Http::withToken($paystackSecret)
-        ->post("https://api.paystack.co/charge", $payload);
+    Log::info('Paystack charge request', $payload);
 
-    return $response->json();
+    try {
+        $response = Http::withToken($paystackSecret)
+            ->post("https://api.paystack.co/charge", $payload);
+
+        Log::info('Paystack response', $response->json());
+
+        return $response->json();
+    } catch (\Exception $e) {
+        Log::error('Paystack error', ['error' => $e->getMessage()]);
+        return response()->json([
+            'status' => false,
+            'message' => 'Payment processing failed'
+        ], 500);
+    }
 }
 
 
