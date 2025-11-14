@@ -104,6 +104,8 @@ Route::post('/paystack/submit-otp', [MemberRegistrationController::class, 'submi
 Route::get('/paystack/check-status/{reference}', [MemberRegistrationController::class, 'checkStatus'])
     ->name('paystack.check.status');
 
+
+
 /**
  * ------------------------------------------------------------
  * ⚙️ SYSTEM / TEST ROUTES (optional)

@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Transaction;
-use App\Models\MembershipType;
 use App\Models\Enums\TransactionStatus;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
@@ -52,6 +51,7 @@ class MemberRegistrationController extends Controller
             'remarks'     => [
                 'type' => 'membership_fee',
                 'membership' => $membershipName,
+                'gateway' => 'paystack',
             ],
         ]);
 
@@ -60,7 +60,6 @@ class MemberRegistrationController extends Controller
             'email' => $member->email,
             'amount' => $membershipAmount,
             'membership_name' => $membershipName,
-            'message' => 'Ready to initialize payment.'
         ]);
     }
 
@@ -82,13 +81,14 @@ class MemberRegistrationController extends Controller
 
         $payload = [
             'email'     => $request->email,
-            'amount'    => $request->amount,
+            'amount'    => $request->amount, // Already in cents from frontend
+            'currency'  => 'USD',
             'reference' => $request->reference,
             'card'      => [
-                'number'        => $request->card['number'],
+                'number'        => str_replace(' ', '', $request->card['number']),
                 'cvv'           => $request->card['cvv'],
                 'expiry_month'  => $request->card['month'],
-                'expiry_year'   => $request->card['year'],
+                'expiry_year'   => '20' . $request->card['year'], // Convert YY to YYYY
             ]
         ];
 
@@ -101,18 +101,18 @@ class MemberRegistrationController extends Controller
             $data = $response->json();
             Log::info('Paystack charge response', $data);
 
-            // Store the reference for OTP/3DS follow-up
+            // Store reference for OTP/3DS follow-up
             if (isset($data['data']['reference'])) {
-                session(['paystack_reference' => $data['data']['reference']]);
+                session(['paystack_charge_reference' => $data['data']['reference']]);
             }
 
             return response()->json($data);
 
         } catch (\Exception $e) {
-            Log::error('Paystack error', ['error' => $e->getMessage()]);
+            Log::error('Paystack charge error', ['error' => $e->getMessage()]);
             return response()->json([
                 'status' => false,
-                'message' => 'Payment processing failed'
+                'message' => 'Payment processing failed: ' . $e->getMessage()
             ], 500);
         }
     }
@@ -121,9 +121,18 @@ class MemberRegistrationController extends Controller
     {
         $paystackSecret = config('services.paystack.secret_key');
 
+        $reference = session('paystack_charge_reference');
+
+        if (!$reference) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Session expired. Please try again.'
+            ], 400);
+        }
+
         $payload = [
             'otp' => $request->otp,
-            'reference' => session('paystack_reference') // Get from session
+            'reference' => $reference
         ];
 
         Log::info('OTP submission', $payload);
@@ -154,13 +163,38 @@ class MemberRegistrationController extends Controller
             $response = Http::withToken($paystackSecret)
                 ->get("https://api.paystack.co/transaction/verify/{$reference}");
 
+            if (!$response->successful()) {
+                return response()->json([
+                    'status' => 'pending',
+                    'message' => 'Unable to verify'
+                ]);
+            }
+
             $data = $response->json();
             
             if ($data['status'] && $data['data']['status'] === 'success') {
-                // Update transaction
-                Transaction::where('referenceId', $reference)->update([
-                    'status' => TransactionStatus::SUCCESS,
-                    'verified_at' => now(),
+                // Find original transaction by metadata or amount
+                $transaction = Transaction::where('email', $data['data']['customer']['email'])
+                    ->where('status', TransactionStatus::PENDING)
+                    ->where('amount', $data['data']['amount'] / 100)
+                    ->latest()
+                    ->first();
+
+                if ($transaction) {
+                    $transaction->update([
+                        'status' => TransactionStatus::SUCCESS,
+                        'verified_at' => now(),
+                        'remarks' => array_merge($transaction->remarks ?? [], [
+                            'paystack_reference' => $reference,
+                            'verified_at' => now()->toDateTimeString(),
+                        ])
+                    ]);
+                }
+
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Payment successful',
+                    'original_reference' => $transaction->referenceId ?? null
                 ]);
             }
 
@@ -202,29 +236,36 @@ class MemberRegistrationController extends Controller
         $data = $verify->json('data');
 
         if ($data && $data['status'] === 'success') {
-            Transaction::where('referenceId', $reference)->update([
-                'status'      => TransactionStatus::SUCCESS,
-                'verified_at' => Carbon::now(),
-                'remarks'     => [
-                    'gateway'          => 'Paystack',
-                    'verified_via'     => 'callback',
-                    'amount_confirmed' => $data['amount'] / 100,
-                    'email'            => $data['customer']['email'] ?? null,
-                ],
-            ]);
+            // Find transaction by our reference OR by email/amount
+            $transaction = Transaction::where('referenceId', $reference)->first();
+            
+            if (!$transaction) {
+                // Fallback: find by email and amount
+                $transaction = Transaction::where('email', $data['customer']['email'])
+                    ->where('status', TransactionStatus::PENDING)
+                    ->where('amount', $data['amount'] / 100)
+                    ->latest()
+                    ->first();
+            }
+
+            if ($transaction) {
+                $transaction->update([
+                    'status'      => TransactionStatus::SUCCESS,
+                    'verified_at' => Carbon::now(),
+                    'remarks'     => array_merge($transaction->remarks ?? [], [
+                        'gateway'          => 'Paystack',
+                        'verified_via'     => 'callback',
+                        'amount_confirmed' => $data['amount'] / 100,
+                        'email'            => $data['customer']['email'] ?? null,
+                        'paystack_reference' => $data['reference'],
+                    ]),
+                ]);
+            }
 
             return Inertia::render('PaymentSuccess', [
                 'data' => $data,
             ]);
         }
-
-        Transaction::where('referenceId', $reference)->update([
-            'status'  => TransactionStatus::FAILED,
-            'remarks' => [
-                'gateway'       => 'Paystack',
-                'error'         => 'Transaction failed',
-            ],
-        ]);
 
         return Inertia::render('PaymentFailed', [
             'message' => 'Payment was not successful.',
@@ -238,29 +279,51 @@ class MemberRegistrationController extends Controller
         $secret    = config('services.paystack.secret_key');
 
         if (hash_hmac('sha512', $payload, $secret) !== $signature) {
+            Log::warning('Invalid Paystack webhook signature');
             abort(403, 'Invalid signature');
         }
 
-        $data = json_decode($payload, true)['data'] ?? null;
+        $event = json_decode($payload, true);
+        $data = $event['data'] ?? null;
 
         if (!$data) {
             return response()->json(['status' => 'no data']);
         }
 
-        $reference = $data['reference'] ?? null;
-        $status    = $data['status'] ?? null;
+        Log::info('Paystack webhook received', ['event' => $event['event'], 'reference' => $data['reference'] ?? 'N/A']);
 
-        if (!$reference || !$status) {
-            return response()->json(['status' => 'missing reference']);
+        if ($event['event'] === 'charge.success') {
+            $reference = $data['reference'] ?? null;
+            $status    = $data['status'] ?? null;
+
+            if (!$reference) {
+                return response()->json(['status' => 'missing reference']);
+            }
+
+            // Find transaction
+            $transaction = Transaction::where('referenceId', $reference)->first();
+            
+            if (!$transaction) {
+                // Fallback
+                $transaction = Transaction::where('email', $data['customer']['email'])
+                    ->where('status', TransactionStatus::PENDING)
+                    ->where('amount', $data['amount'] / 100)
+                    ->latest()
+                    ->first();
+            }
+
+            if ($transaction && $status === 'success') {
+                $transaction->update([
+                    'status'      => TransactionStatus::SUCCESS,
+                    'verified_at' => now(),
+                    'remarks'     => array_merge($transaction->remarks ?? [], [
+                        'gateway' => 'Paystack',
+                        'verified_via' => 'webhook',
+                        'paystack_data' => $data,
+                    ]),
+                ]);
+            }
         }
-
-        Transaction::where('referenceId', $reference)->update([
-            'status'      => $status === 'success'
-                ? TransactionStatus::SUCCESS
-                : TransactionStatus::FAILED,
-            'verified_at' => now(),
-            'remarks'     => $data,
-        ]);
 
         return response()->json(['status' => 'ok']);
     }
