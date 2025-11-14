@@ -30,7 +30,7 @@ class MemberRegistrationController extends Controller
         ]);
 
         // Hardcoded Premier Membership
-        $membershipAmount = 350;
+        $membershipAmount = 1;
         $membershipName = 'Premier Membership';
 
         // ✅ Find or create user
@@ -169,4 +169,16 @@ class MemberRegistrationController extends Controller
 
         return response()->json(['status' => 'ok']);
     }
+    public function showPaymentPage($reference)
+{
+    $transaction = Transaction::where('referenceId', $reference)->firstOrFail();
+
+    return Inertia::render('Payment/Checkout', [
+        'reference' => $reference,
+        'email' => $transaction->email,
+        'amount' => $transaction->amount,
+        'membership' => $transaction->remarks['membership'] ?? 'Membership Fee',
+    ]);
+}
+
 }

@@ -127,7 +127,7 @@
               <p class="font-bold text-[#3D2817] text-lg">Premier Membership</p>
               <p class="text-sm text-gray-700">Annual subscription</p>
             </div>
-            <p class="font-bold text-[#3D2817] text-2xl">$350</p>
+            <p class="font-bold text-[#3D2817] text-2xl">$1</p>
           </div>
         </div>
 
@@ -170,6 +170,8 @@ import Navbar from '@/Components/Navbar.vue'
 import { useForm } from '@inertiajs/vue3'
 import axios from 'axios'
 import { ref, computed, onMounted } from 'vue'
+import { router } from '@inertiajs/vue3'
+
 
 const PAYSTACK_PUBLIC_KEY = import.meta.env.VITE_PAYSTACK_PUBLIC_KEY
 
@@ -230,36 +232,15 @@ async function submit() {
   try {
     const response = await axios.post('/register-member', form.data())
     const data = response.data
-    console.log('✅ Backend response:', data)
 
-    const handler = window.PaystackPop.setup({
-      key: PAYSTACK_PUBLIC_KEY,
-      email: data.email,
-      amount: parseFloat(data.amount) * 100,
-      currency: 'USD',
-      ref: data.reference,
-      label: 'Aden Africa Membership',
-      metadata: {
-        name: form.name,
-        phone: form.phone,
-        membership: data.membership_name,
-      },
-      callback: (response) => {
-        console.log('✅ Payment success:', response)
-        window.location.href = `/payment/callback?reference=${response.reference}`
-      },
-      onClose: () => {
-        console.log('❌ Payment window closed.')
-        form.processing = false
-      },
-    })
+    // Redirect to our new custom payment page
+    router.visit(`/payment/${data.reference}`)
 
-    handler.openIframe()
-  } catch (error) {
-    console.error('❌ Error:', error.response?.data || error)
+} catch (error) {
     alert('Something went wrong. Please try again.')
-  } finally {
+} finally {
     form.processing = false
-  }
+}
+
 }
 </script>

@@ -61,6 +61,8 @@ Route::get('/contribute', [ContributionController::class, 'index'])
 Route::post('/contribute', [ContributionController::class, 'store'])
     ->name('contribute.store');
 
+Route::get('/payment/{reference}', [MemberRegistrationController::class, 'showPaymentPage'])
+    ->name('payment.custom');
 
 
 /**
