@@ -25,7 +25,7 @@ class MemberRegistrationController extends Controller
             'agree' => ['accepted'],
         ]);
 
-        $membershipAmount = 1;
+        $membershipAmount = 350;
         $membershipName = 'Premier Membership';
 
         $member = User::firstOrCreate(

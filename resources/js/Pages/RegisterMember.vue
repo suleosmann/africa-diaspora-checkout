@@ -127,7 +127,7 @@
               <p class="font-bold text-[#3D2817] text-lg">Premier Membership</p>
               <p class="text-sm text-gray-700">Annual subscription</p>
             </div>
-            <p class="font-bold text-[#3D2817] text-2xl">$1</p>
+            <p class="font-bold text-[#3D2817] text-2xl">$350</p>
           </div>
         </div>
 
