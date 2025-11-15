@@ -170,6 +170,8 @@ import Navbar from '@/Components/Navbar.vue'
 import { useForm } from '@inertiajs/vue3'
 import axios from 'axios'
 import { ref, computed, onMounted } from 'vue'
+import { router } from '@inertiajs/vue3'
+
 
 const PAYSTACK_PUBLIC_KEY = import.meta.env.VITE_PAYSTACK_PUBLIC_KEY
 
@@ -231,46 +233,14 @@ async function submit() {
     const response = await axios.post('/register-member', form.data())
     const data = response.data
 
-    console.log('✅ Member registered:', data)
+    // Redirect to our new custom payment page
+    router.visit(`/payment/${data.reference}`)
 
-    // Initialize Paystack popup
-    const handler = window.PaystackPop.setup({
-      key: PAYSTACK_PUBLIC_KEY,
-      email: data.email,
-      amount: data.amount * 100, // Convert to kobo/cents
-      currency: 'USD',
-      ref: data.reference,
-      metadata: {
-        custom_fields: [
-          {
-            display_name: 'Member Name',
-            variable_name: 'member_name',
-            value: form.name
-          },
-          {
-            display_name: 'Membership Type',
-            variable_name: 'membership_type',
-            value: data.membership_name
-          }
-        ]
-      },
-      callback: function(response) {
-        console.log('✅ Payment successful:', response)
-        // Redirect to callback route
-        window.location.href = `/payment/callback?reference=${response.reference}`
-      },
-      onClose: function() {
-        console.log('⚠️ Payment popup closed')
-        form.processing = false
-      }
-    })
-
-    handler.openIframe()
-
-  } catch (error) {
-    console.error('❌ Registration error:', error)
+} catch (error) {
     alert('Something went wrong. Please try again.')
+} finally {
     form.processing = false
-  }
+}
+
 }
 </script>
