@@ -1,6 +1,6 @@
 <template>
   <div class="relative min-h-[70vh] bg-[#F5F1E8]">
-    <div style="background-image: url('/belowheader.png');" class="mt-24 h-20"></div>
+    <div style="background-image: url('/belowheader.png');" class="mt-10 h-16"></div>
     <!-- Background Pattern - Right Side -->
     <div class="fixed top-0 right-0 w-1/2 h-full pointer-events-none z-0 overflow-hidden">
         <img 
@@ -11,7 +11,7 @@
     </div>
 
     <!-- Content -->
-    <div class="relative z-10 max-w-7xl mx-auto px-6 py-20">
+    <div class="relative z-10 max-w-7xl mx-auto px-6 py-2">
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
         
         <!-- Left Side - Video -->

@@ -5,7 +5,7 @@
     <div class="relative z-10 max-w-5xl mx-auto px-6">
       <!-- Heading -->
       <h1 class="text-4xl md:text-5xl font-bold text-[#FFDA9E] mb-8">
-        Join ADEN Today (Premier Membership)
+        Join ADEN Today 
       </h1>
 
       <!-- Description -->

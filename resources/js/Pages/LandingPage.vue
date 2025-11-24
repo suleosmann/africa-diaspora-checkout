@@ -1,5 +1,5 @@
 <template>
-  <div class="relative min-h-[80vh] bg-cover bg-center bg-no-repeat -mt-8" 
+  <div class="relative min-h-[60vh] bg-cover bg-center bg-no-repeat -mt-16" 
        style="background-image: url('/globe.avif');">
     <!-- Dark overlay -->
     <div class="absolute inset-0 bg-black/50 z-0"></div>
@@ -11,20 +11,20 @@
       </div>
       
       <!-- Hero Section -->
-      <div class="flex flex-col items-center justify-center text-center px-6 mt-32">
-        <h1 class="text-5xl md:text-6xl font-bold text-[#FFDA9E] mb-6 max-w-5xl">
+      <div class="flex flex-col items-center justify-center text-center px-6 mt-16">
+        <h1 class="text-5xl md:text-6xl font-bold text-[#FFDA9E] mb-4 max-w-5xl">
           Begin your Journey to Own Africa
         </h1>
         
-        <p class="text-white text-lg md:text-xl mb-24 max-w-5xl">
+        <p class="text-white text-lg md:text-xl mb-8 max-w-5xl">
           Connecting talent, technology, and opportunity across the continent's fastest-growing digital ecosystem
         </p>
         
         <a 
-          href="/download-thesis"
+          href="/register"
           class="inline-block bg-[#3D2817] hover:bg-[#2a1d13] text-[#FFDA9E] font-semibold px-24 py-4 rounded-2xl text-lg transition-all border-2 border-[#FFDA9E]"
         >
-          Download the ADEN Thesis
+          Join Today
         </a>
       </div>
       
