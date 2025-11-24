@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Transaction;
 use App\Models\Enums\TransactionStatus;
+use App\Models\Enums\RegisterType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
@@ -22,11 +23,9 @@ class MemberRegistrationController extends Controller
             'phone' => ['required', 'string', 'max:20'],
             'industry' => ['nullable', 'string', 'max:255'],
             'region' => ['nullable', 'string', 'max:255'],
+            'register_type' => ['required', 'integer', 'in:0,1,-1'],
             'agree' => ['accepted'],
         ]);
-
-        $membershipAmount = 350;
-        $membershipName = 'Premier Membership';
 
         $member = User::firstOrCreate(
             ['email' => $data['email']],
@@ -36,21 +35,53 @@ class MemberRegistrationController extends Controller
                 'phone' => $data['phone'],
                 'industry' => $data['industry'] ?? null,
                 'region' => $data['region'] ?? null,
+                'register_type' => $data['register_type'],
                 'password' => bcrypt(Str::random(12)),
             ]
         );
 
+        if (!$member->wasRecentlyCreated) {
+            $member->update([
+                'register_type' => $data['register_type'],
+                'name' => $data['name'],
+                'phone' => $data['phone'],
+                'industry' => $data['industry'] ?? null,
+                'region' => $data['region'] ?? null,
+            ]);
+        }
+
+        // Free membership (0) - just save and return
+        if ($data['register_type'] === RegisterType::FREE->value) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Free membership registered successfully',
+                'email' => $member->email,
+            ]);
+        }
+
+        // Download membership (1) - just save and return
+        if ($data['register_type'] === RegisterType::DOWNLOAD->value) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Download membership registered successfully',
+                'email' => $member->email,
+            ]);
+        }
+
+        // Contribute membership (-1) - create transaction and continue with payment
+        $membershipDetails = $this->getMembershipDetails($data['register_type']);
         $reference = 'MBR_' . strtoupper(Str::random(10));
 
         Transaction::create([
             'referenceId' => $reference,
             'name'        => $member->name,
             'email'       => $member->email,
-            'amount'      => $membershipAmount,
+            'amount'      => $membershipDetails['amount'],
             'status'      => TransactionStatus::PENDING,
             'remarks'     => [
                 'type' => 'membership_fee',
-                'membership' => $membershipName,
+                'membership' => $membershipDetails['name'],
+                'register_type' => $data['register_type'],
                 'gateway' => 'paystack',
             ],
         ]);
@@ -58,9 +89,31 @@ class MemberRegistrationController extends Controller
         return response()->json([
             'reference' => $reference,
             'email' => $member->email,
-            'amount' => $membershipAmount,
-            'membership_name' => $membershipName,
+            'amount' => $membershipDetails['amount'],
+            'membership_name' => $membershipDetails['name'],
         ]);
+    }
+
+    private function getMembershipDetails(int $registerType): array
+    {
+        return match ($registerType) {
+            RegisterType::FREE->value => [
+                'name' => 'Free Membership',
+                'amount' => 0,
+            ],
+            RegisterType::DOWNLOAD->value => [
+                'name' => 'Download Membership',
+                'amount' => 150,
+            ],
+            RegisterType::CONTRIBUTE->value => [
+                'name' => 'Premier Membership',
+                'amount' => 350,
+            ],
+            default => [
+                'name' => 'Unknown',
+                'amount' => 0,
+            ],
+        };
     }
 
     public function callback(Request $request)
@@ -87,7 +140,6 @@ class MemberRegistrationController extends Controller
         $data = $verify->json('data');
 
         if ($data && $data['status'] === 'success') {
-            // Find transaction by email and amount (since Paystack generates its own reference)
             $transaction = Transaction::where('email', $data['customer']['email'])
                 ->where('status', TransactionStatus::PENDING)
                 ->where('amount', $data['amount'] / 100)
@@ -146,7 +198,6 @@ class MemberRegistrationController extends Controller
                 return response()->json(['status' => 'missing reference']);
             }
 
-            // Find transaction by email and amount
             $transaction = Transaction::where('email', $data['customer']['email'])
                 ->where('status', TransactionStatus::PENDING)
                 ->where('amount', $data['amount'] / 100)

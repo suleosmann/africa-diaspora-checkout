@@ -120,15 +120,74 @@
           <p v-if="form.errors.email" class="text-red-600 text-sm mt-1">{{ form.errors.email }}</p>
         </div>
 
-        <!-- Membership Type Info -->
-        <div class="bg-[#FFDA9E] rounded-lg p-4 border-2 border-[#3D2817]">
-          <div class="flex justify-between items-center">
-            <div>
-              <p class="font-bold text-[#3D2817] text-lg">Premier Membership</p>
-              <p class="text-sm text-gray-700">Annual subscription</p>
+        <!-- Membership Type Selection -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-900 mb-3">Select Membership Type</label>
+          <div class="grid grid-cols-3 gap-3">
+            <!-- Free Membership -->
+            <div 
+              @click="selectMembership(0)"
+              :class="[
+                'rounded-lg p-3 border-2 cursor-pointer transition text-center',
+                form.register_type === 0 
+                  ? 'border-[#3D2817] bg-[#FFDA9E]' 
+                  : 'border-gray-300 bg-white hover:border-gray-400'
+              ]"
+            >
+              <div class="flex justify-center mb-2">
+                <input 
+                  type="radio" 
+                  :checked="form.register_type === 0"
+                  class="text-[#3D2817] focus:ring-[#FFDA9E]"
+                />
+              </div>
+              <p class="font-bold text-[#3D2817] text-base">Free</p>
+              <p class="text-xs text-gray-700 mt-1">Basic access</p>
             </div>
-            <p class="font-bold text-[#3D2817] text-2xl">$350</p>
+
+            <!-- Download Membership -->
+            <div 
+              @click="selectMembership(1)"
+              :class="[
+                'rounded-lg p-3 border-2 cursor-pointer transition text-center',
+                form.register_type === 1 
+                  ? 'border-[#3D2817] bg-[#FFDA9E]' 
+                  : 'border-gray-300 bg-white hover:border-gray-400'
+              ]"
+            >
+              <div class="flex justify-center mb-2">
+                <input 
+                  type="radio" 
+                  :checked="form.register_type === 1"
+                  class="text-[#3D2817] focus:ring-[#FFDA9E]"
+                />
+              </div>
+              <p class="font-bold text-[#3D2817] text-base">Download</p>
+              <p class="text-xs text-gray-700 mt-1">Download access</p>
+            </div>
+
+            <!-- Contribute Membership -->
+            <div 
+              @click="selectMembership(-1)"
+              :class="[
+                'rounded-lg p-3 border-2 cursor-pointer transition text-center',
+                form.register_type === -1 
+                  ? 'border-[#3D2817] bg-[#FFDA9E]' 
+                  : 'border-gray-300 bg-white hover:border-gray-400'
+              ]"
+            >
+              <div class="flex justify-center mb-2">
+                <input 
+                  type="radio" 
+                  :checked="form.register_type === -1"
+                  class="text-[#3D2817] focus:ring-[#FFDA9E]"
+                />
+              </div>
+              <p class="font-bold text-[#3D2817] text-base">Premier</p>
+              <p class="text-xs text-gray-700 mt-1">$350/year</p>
+            </div>
           </div>
+          <p v-if="form.errors.register_type" class="text-red-600 text-sm mt-1">{{ form.errors.register_type }}</p>
         </div>
 
         <!-- Terms -->
@@ -150,16 +209,11 @@
         <!-- Submit Button -->
         <button
           type="submit"
-          :disabled="form.processing"
+          :disabled="form.processing || form.register_type === null"
           class="w-full bg-[#3D2817] hover:bg-[#2a1d13] text-white font-semibold py-3 rounded-lg transition disabled:opacity-50"
         >
-          {{ form.processing ? 'Processing...' : 'Proceed to Payment' }}
+          {{ form.processing ? 'Processing...' : getMembershipButtonText() }}
         </button>
-
-        <!-- <p class="text-center text-sm text-gray-900 mt-4">
-          Already have an account?
-          <a href="/login" class="text-[#3D2817] hover:underline font-semibold">Sign in here</a>
-        </p> -->
       </form>
     </div>
   </div>
@@ -209,19 +263,32 @@ const form = useForm({
   email: '',
   industry: '',
   region: '',
+  register_type: null,
   agree: false,
 })
+
+const selectMembership = (type) => {
+  form.register_type = type
+}
+
+const getMembershipButtonText = () => {
+  if (form.register_type === null) {
+    return 'Select Membership Type'
+  }
+  if (form.register_type === 0) {
+    return 'Create Free Account'
+  }
+  if (form.register_type === 1) {
+    return 'Continue to Download'
+  }
+  return 'Proceed to Payment'
+}
 
 async function submit() {
   console.log('🟡 Submitting form:', form.data())
 
-  if (!PAYSTACK_PUBLIC_KEY) {
-    alert('⚠️ Paystack key not configured. Please contact support.')
-    return
-  }
-
-  if (!window.PaystackPop) {
-    alert('⚠️ Paystack script not loaded. Please refresh the page.')
+  if (form.register_type === null) {
+    alert('⚠️ Please select a membership type')
     return
   }
 
@@ -233,11 +300,35 @@ async function submit() {
 
     console.log('✅ Member registered:', data)
 
-    // Initialize Paystack popup
+    // Free membership - save and show success
+    if (form.register_type === 0) {
+      window.location.href = '/registration/success'
+      return
+    }
+
+    // Download membership - save and redirect to download-thesis
+    if (form.register_type === 1) {
+      window.location.href = '/download-thesis'
+      return
+    }
+
+    // Contribute membership - continue with payment
+    if (!PAYSTACK_PUBLIC_KEY) {
+      alert('⚠️ Paystack key not configured. Please contact support.')
+      form.processing = false
+      return
+    }
+
+    if (!window.PaystackPop) {
+      alert('⚠️ Paystack script not loaded. Please refresh the page.')
+      form.processing = false
+      return
+    }
+
     const handler = window.PaystackPop.setup({
       key: PAYSTACK_PUBLIC_KEY,
       email: data.email,
-      amount: data.amount * 100, // Convert to kobo/cents
+      amount: data.amount * 100,
       currency: 'USD',
       ref: data.reference,
       metadata: {
@@ -256,7 +347,6 @@ async function submit() {
       },
       callback: function(response) {
         console.log('✅ Payment successful:', response)
-        // Redirect to callback route
         window.location.href = `/payment/callback?reference=${response.reference}`
       },
       onClose: function() {

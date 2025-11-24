@@ -8,6 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Support\Str;
+use App\Models\Enums\RegisterType;
 
 class User extends Authenticatable
 {
@@ -23,11 +24,13 @@ class User extends Authenticatable
         'region',
         'membership_type_id',
         'agreed_to_terms',
+        'register_type',
     ];
 
     protected $casts = [
         'email_verified_at' => 'datetime',
         'agreed_to_terms' => 'boolean',
+        'register_type' => RegisterType::class,
     ];
 
     /**
