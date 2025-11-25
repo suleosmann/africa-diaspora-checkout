@@ -1,5 +1,8 @@
 <template>
-  <div class="relative min-h-screen bg-[#f0e9d7] py-16">
+  <div class="relative min-h-sch-[60vh] py-16" style="background-image: url('/bg4.jpg'); background-size: cover; background-position: center;">
+    <!-- White Overlay -->
+    <div class="absolute inset-0 bg-white/80 z-0"></div>
+    
     <!-- Content -->
     <div class="relative z-10 max-w-7xl mx-auto px-6">
       <!-- Title -->
@@ -43,12 +46,12 @@
 
             <!-- CTA Button (if available) -->
             <div v-if="tabs[activeTab].showCTA" class="mt-8">
-              <!-- <a 
+              <a 
                 href="/register"
                 class="inline-block bg-[#3D2817] hover:bg-[#2a1d13] text-[#FFDA9E] font-semibold px-8 py-3 rounded-xl transition-all border-2 border-[#3D2817]"
               >
                 Join ADEN Today
-              </a> -->
+              </a>
             </div>
           </div>
         </div>

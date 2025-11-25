@@ -1,7 +1,10 @@
 <template>
-  <div class="relative min-h-screen bg-[#3D2817] py-16">
+  <div class="relative min-h-screen py-16" style="background-image: url('/bg5.png'); background-size: cover; background-position: center;">
+    <!-- Brown Overlay -->
+    <div class="absolute inset-0 bg-[#3D2817]/98 z-0"></div>
+    
     <!-- Content -->
-    <div class="relative z-10 max-w-7xl mx-auto px-">
+    <div class="relative z-10 max-w-7xl mx-auto px-6">
       <!-- Title -->
       <h2 class="text-4xl md:text-5xl font-bold text-[#FFDA9E] mb-12">
           Core Components<br/>
@@ -19,7 +22,7 @@
             :class="[
               'text-left p-6 rounded-xl font-medium text-lg transition-all  mb-4',
               activeTab === 0 
-                ? 'bg-[#5A3D2B] text-[#FFDA9E] ' 
+                ? 'bg-[#5A3D2B] text-[#FFDA9E]' 
                 : 'bg-transparent text-[#FFDA9E]  border-[#FFDA9E] hover:bg-[#5A3D2B]'
             ]"
           >
@@ -35,7 +38,7 @@
             :class="[
               'text-left p-6 rounded-xl font-medium text-lg transition-all  mb-4',
               activeTab === 1 
-                ? 'bg-[#5A3D2B] text-[#FFDA9E] ' 
+                ? 'bg-[#5A3D2B] text-[#FFDA9E]' 
                 : 'bg-transparent text-[#FFDA9E] border-[#FFDA9E] hover:bg-[#5A3D2B]'
             ]"
           >
@@ -67,7 +70,7 @@
             :class="[
               'text-left p-6 rounded-xl font-medium text-lg transition-all  mb-4',
               activeTab === 3
-                ? 'bg-[#5A3D2B] text-[#FFDA9E] ' 
+                ? 'bg-[#5A3D2B] text-[#FFDA9E]' 
                 : 'bg-transparent text-[#FFDA9E] border-[#FFDA9E] hover:bg-[#5A3D2B]'
             ]"
           >
@@ -83,7 +86,7 @@
             :class="[
               'text-left p-6 rounded-xl font-medium text-lg transition-all',
               activeTab === 4
-                ? 'bg-[#5A3D2B] text-[#FFDA9E] ' 
+                ? 'bg-[#5A3D2B] text-[#FFDA9E]' 
                 : 'bg-transparent text-[#FFDA9E] border-[#FFDA9E] hover:bg-[#5A3D2B]'
             ]"
           >

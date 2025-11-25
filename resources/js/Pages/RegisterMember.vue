@@ -185,74 +185,74 @@
         </div>
 
         <!-- Membership Type Selection -->
-        <div>
-          <label class="block text-sm font-semibold text-gray-900 mb-3">Select Membership Type</label>
-          <div class="grid grid-cols-3 gap-3">
-            <!-- Free Membership -->
-            <div 
-              @click="selectMembership(0)"
-              :class="[
-                'rounded-lg p-3 border-2 cursor-pointer transition text-center',
-                form.register_type === 0 
-                  ? 'border-[#3D2817] bg-[#FFDA9E]' 
-                  : 'border-gray-300 bg-white hover:border-gray-400'
-              ]"
-            >
-              <div class="flex justify-center mb-2">
-                <input 
-                  type="radio" 
-                  :checked="form.register_type === 0"
-                  class="text-[#3D2817] focus:ring-[#FFDA9E]"
-                />
-              </div>
-              <p class="font-bold text-[#3D2817] text-base">Free</p>
-              <p class="text-xs text-gray-700 mt-1">Basic access</p>
+      <div>
+        <label class="block text-sm font-semibold text-gray-900 mb-3">Select Membership Type</label>
+        <div class="grid grid-cols-3 gap-3">
+          <!-- Join Network Membership -->
+          <div 
+            @click="selectMembership(0)"
+            :class="[
+              'rounded-lg p-2 border-2 cursor-pointer transition text-center',
+              form.register_type === 0 
+                ? 'border-[#3D2817] bg-[#FFDA9E]' 
+                : 'border-gray-300 bg-white hover:border-gray-400'
+            ]"
+          >
+            <div class="flex justify-center mb-1">
+              <input 
+                type="radio" 
+                :checked="form.register_type === 0"
+                class="text-[#3D2817] focus:ring-[#FFDA9E]"
+              />
             </div>
-
-            <!-- Download Membership -->
-            <div 
-              @click="selectMembership(1)"
-              :class="[
-                'rounded-lg p-3 border-2 cursor-pointer transition text-center',
-                form.register_type === 1 
-                  ? 'border-[#3D2817] bg-[#FFDA9E]' 
-                  : 'border-gray-300 bg-white hover:border-gray-400'
-              ]"
-            >
-              <div class="flex justify-center mb-2">
-                <input 
-                  type="radio" 
-                  :checked="form.register_type === 1"
-                  class="text-[#3D2817] focus:ring-[#FFDA9E]"
-                />
-              </div>
-              <p class="font-bold text-[#3D2817] text-base">Download</p>
-              <p class="text-xs text-gray-700 mt-1">Download access</p>
-            </div>
-
-            <!-- Contribute Membership -->
-            <div 
-              @click="selectMembership(-1)"
-              :class="[
-                'rounded-lg p-3 border-2 cursor-pointer transition text-center',
-                form.register_type === -1 
-                  ? 'border-[#3D2817] bg-[#FFDA9E]' 
-                  : 'border-gray-300 bg-white hover:border-gray-400'
-              ]"
-            >
-              <div class="flex justify-center mb-2">
-                <input 
-                  type="radio" 
-                  :checked="form.register_type === -1"
-                  class="text-[#3D2817] focus:ring-[#FFDA9E]"
-                />
-              </div>
-              <p class="font-bold text-[#3D2817] text-base">Premier</p>
-              <p class="text-xs text-gray-700 mt-1">$350/year</p>
-            </div>
+            <p class="font-bold text-[#3D2817] text-sm">Join Network</p>
+            <p class="text-xs text-gray-700 mt-0.5">Basic access</p>
           </div>
-          <p v-if="form.errors.register_type" class="text-red-600 text-sm mt-1">{{ form.errors.register_type }}</p>
+
+          <!-- Become Member -->
+          <div 
+            @click="selectMembership(1)"
+            :class="[
+              'rounded-lg p-2 border-2 cursor-pointer transition text-center',
+              form.register_type === 1 
+                ? 'border-[#3D2817] bg-[#FFDA9E]' 
+                : 'border-gray-300 bg-white hover:border-gray-400'
+            ]"
+          >
+            <div class="flex justify-center mb-1">
+              <input 
+                type="radio" 
+                :checked="form.register_type === 1"
+                class="text-[#3D2817] focus:ring-[#FFDA9E]"
+              />
+            </div>
+            <p class="font-bold text-[#3D2817] text-sm whitespace-nowrap">Become Member</p>
+            <p class="text-xs text-gray-700 mt-0.5">Download access</p>
+          </div>
+
+          <!-- Premier Membership -->
+          <div 
+            @click="selectMembership(-1)"
+            :class="[
+              'rounded-lg p-2 border-2 cursor-pointer transition text-center',
+              form.register_type === -1 
+                ? 'border-[#3D2817] bg-[#FFDA9E]' 
+                : 'border-gray-300 bg-white hover:border-gray-400'
+            ]"
+          >
+            <div class="flex justify-center mb-1">
+              <input 
+                type="radio" 
+                :checked="form.register_type === -1"
+                class="text-[#3D2817] focus:ring-[#FFDA9E]"
+              />
+            </div>
+            <p class="font-bold text-[#3D2817] text-sm">Premier</p>
+            <p class="text-xs text-gray-700 mt-0.5">$350/year</p>
+          </div>
         </div>
+        <p v-if="form.errors.register_type" class="text-red-600 text-sm mt-1">{{ form.errors.register_type }}</p>
+      </div>
 
         <!-- Terms -->
         <div class="flex items-start gap-3">
@@ -415,10 +415,10 @@ const getMembershipButtonText = () => {
     return 'Select Membership Type'
   }
   if (form.register_type === 0) {
-    return 'Create Free Account'
+    return 'Join Network'
   }
   if (form.register_type === 1) {
-    return 'Continue to Download'
+    return 'Become Member'
   }
   return 'Proceed to Payment'
 }
