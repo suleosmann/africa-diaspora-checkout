@@ -455,19 +455,19 @@ async function submit() {
 
     console.log('✅ Member registered:', data)
 
-    // Free membership - save and show success
+    // Join Network (Type 0) - redirect to join network success page
     if (form.register_type === 0) {
-      window.location.href = '/registration/success'
+      window.location.href = '/join-network-success'
       return
     }
 
-    // Download membership - save and redirect to download-thesis
+    // Become Member (Type 1) - redirect to download success page
     if (form.register_type === 1) {
-      window.location.href = '/download-thesis'
+      window.location.href = '/download-success'
       return
     }
 
-    // Contribute membership - continue with payment
+    // Premier membership (-1) - continue with payment
     if (!PAYSTACK_PUBLIC_KEY) {
       alert('⚠️ Paystack key not configured. Please contact support.')
       form.processing = false

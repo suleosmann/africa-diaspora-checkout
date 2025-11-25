@@ -6,37 +6,12 @@ use App\Http\Controllers\MemberRegistrationController;
 use App\Http\Controllers\ContributionController;
 use App\Models\MembershipType;
 
-
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you register web routes for your application.
-| Each route returns an Inertia view or calls a controller method.
-|
-*/
-
-
-/**
- * ------------------------------------------------------------
- * 🌍 PUBLIC LANDING / HOMEPAGE
- * ------------------------------------------------------------
- * You can keep this simple or redirect to registration.
- */
 Route::get('/', fn () => Inertia::render('LandingPage'))
     ->name('home');
+
 Route::get('/register', fn () => Inertia::render('RegisterMember'))
     ->name('register.member.home');
 
-
-
-/**
- * ------------------------------------------------------------
- * 🧾 MEMBER REGISTRATION FLOW
- * ------------------------------------------------------------
- * New members can register and immediately pay via Paystack.
- */
 Route::post('/register-member', [MemberRegistrationController::class, 'store'])
     ->name('register.member');
 
@@ -46,15 +21,6 @@ Route::get('/payment/callback', [MemberRegistrationController::class, 'callback'
 Route::post('/payment/webhook', [MemberRegistrationController::class, 'handleWebhook'])
     ->name('member.payment.webhook');
 
-
-
-/**
- * ------------------------------------------------------------
- * 🎁 OPTIONAL: GENERAL CONTRIBUTION FLOW
- * ------------------------------------------------------------
- * Keep this if you also accept one-time donations
- * without requiring registration.
- */
 Route::get('/contribute', [ContributionController::class, 'index'])
     ->name('contribute.page');
 
@@ -67,21 +33,13 @@ Route::get('/payment/{reference}', [MemberRegistrationController::class, 'showPa
 Route::post('/paystack/charge', [MemberRegistrationController::class, 'charge'])
     ->name('paystack.charge');
 
-
-
-/**
- * ------------------------------------------------------------
- * 💳 MEMBERSHIP TYPES ENDPOINT
- * ------------------------------------------------------------
- * Used by your Vue form to populate the membership dropdown.
- * Returns all active membership plans (Basic, Premium, Gold, etc.).
- */
 Route::get('/membership-types', function () {
     return response()->json([
         'data' => MembershipType::select('id', 'name', 'amount')->orderBy('amount')->get(),
     ]);
 })->name('membership.types');
 
+// Download thesis route (keeps existing functionality)
 Route::get('/download-thesis', function () {
     $filePath = public_path('thesis.pdf');
     
@@ -95,21 +53,20 @@ Route::get('/download-thesis', function () {
     ]);
 });
 
-Route::post('/paystack/charge', [MemberRegistrationController::class, 'charge'])
-    ->name('paystack.charge');
-
 Route::post('/paystack/submit-otp', [MemberRegistrationController::class, 'submitOtp'])
     ->name('paystack.submit.otp');
 
 Route::get('/paystack/check-status/{reference}', [MemberRegistrationController::class, 'checkStatus'])
     ->name('paystack.check.status');
 
+// NEW SUCCESS PAGES
+Route::get('/join-network-success', function () {
+    return inertia('JoinNetworkSuccessPage');
+})->name('join.network.success');
+
+Route::get('/download-success', function () {
+    return inertia('DownloadSuccessPage');
+})->name('download.success');
 
 
-/**
- * ------------------------------------------------------------
- * ⚙️ SYSTEM / TEST ROUTES (optional)
- * ------------------------------------------------------------
- * For example, a simple health check route for server testing.
- */
 Route::get('/up', fn () => ['status' => 'ok']);
