@@ -59,7 +59,6 @@
             <div class="relative w-32">
               <button
                 @click="showPhoneDropdown = !showPhoneDropdown"
-                @blur="hidePhoneDropdown"
                 type="button"
                 class="w-full rounded-lg border-0 bg-white shadow-sm py-3 px-3 text-gray-900 focus:ring-2 focus:ring-[#FFDA9E] flex items-center justify-between"
               >
@@ -79,7 +78,6 @@
                   <input
                     v-model="phoneSearchQuery"
                     @click.stop
-                    @mousedown.stop
                     type="text"
                     placeholder="Search country..."
                     class="w-full border-b border-gray-200 px-3 py-2 text-sm focus:outline-none bg-white"
@@ -287,7 +285,7 @@
 import Navbar from '@/Components/Navbar.vue'
 import { useForm } from '@inertiajs/vue3'
 import axios from 'axios'
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 
 const PAYSTACK_PUBLIC_KEY = import.meta.env.VITE_PAYSTACK_PUBLIC_KEY
 
@@ -305,7 +303,13 @@ const selectedCountryCode = ref({
   cca2: 'US',
   flag: '🇺🇸'
 })
-
+const handleClickOutside = (event) => {
+  const phoneDropdown = event.target.closest('.relative.w-32')
+  if (!phoneDropdown && showPhoneDropdown.value) {
+    showPhoneDropdown.value = false
+    phoneSearchQuery.value = ''
+  }
+}
 // Helper function to get flag emoji from country code
 const getFlagEmoji = (countryCode) => {
   if (!countryCode) return ''
@@ -352,6 +356,12 @@ onMounted(async () => {
     selectedCountryCode.value = usa
     form.country_code = usa.dial_code
   }
+    document.addEventListener('click', handleClickOutside)
+
+})
+
+onBeforeUnmount(() => {
+  document.removeEventListener('click', handleClickOutside)
 })
 
 const filteredPhoneCodes = computed(() => {
@@ -369,11 +379,11 @@ const selectPhoneCode = (country) => {
   phoneSearchQuery.value = ''
 }
 
-const hidePhoneDropdown = () => {
-  setTimeout(() => {
-    showPhoneDropdown.value = false
-  }, 200)
-}
+// const hidePhoneDropdown = () => {
+//   setTimeout(() => {
+//     showPhoneDropdown.value = false
+//   }, 200)
+// }
 
 const filteredCountries = computed(() => {
   if (!searchQuery.value) return countries.value
