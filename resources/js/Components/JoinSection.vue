@@ -5,12 +5,13 @@
     <div class="relative z-10 max-w-6xl mx-auto px-6">
       <!-- Heading -->
       <h1 class="text-3xl md:text-5xl lg:text-6xl font-bold text-[#FFDA9E] mb-8 leading-tight">
-        Africa's Macro Opportunity<br/>
-        The Investment Case Behind GELB
+        Africa Is building the Largest Smart<br/>
+        Economic Corridor in the World
+         
       </h1>
 
       <!-- Description -->
-      <p class="text-[#FFDA9E] text-base md:text-lg lg:text-xl leading-relaxed mb-12 max-w-5xl mx-auto">
+      <p class="text-[#FFDA9E] text-base text-left md:text-lg lg:text-xl leading-relaxed mb-12 max-w-6xl mx-auto">
         Africa today sits at the center of one of the largest economic transformations of the 21st century, and the Great Equatorial Land Bridge (GELB) is positioned as a flagship catalyst of this shift. The GELB Corridor—linking Lamu (Kenya) to Douala (Cameroon) through South Sudan and the Central African Republic—is endorsed by the African Union as a continental-scale logistics, transport, and energy backbone. The Lamu Port SEZ City serves as the eastern anchor, integrating maritime infrastructure, SEZ-driven industrialization, and green urban development to drive regional growth.
       </p>
 
