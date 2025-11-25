@@ -1,5 +1,5 @@
 <template>
-  <div class="relative min-h-[60vh] bg-cover bg-center bg-no-repeat -mt-16" 
+  <div class="relative min-h-[60vh] bg-cover bg-center bg-no-repeat -mt-16 " 
        style="background-image: url('/globe.avif');">
     <!-- Dark overlay -->
     <div class="absolute inset-0 bg-black/50 z-0"></div>
@@ -11,9 +11,9 @@
       </div>
       
       <!-- Hero Section -->
-      <div class="flex flex-col items-center justify-center text-center px-6 mt-16">
-        <h1 class="text-5xl md:text-6xl font-bold text-[#FFDA9E] mb-4 max-w-5xl">
-          Begin your Journey to Own Africa
+      <div class="flex flex-col items-center justify-center text-center px-6 mt-16 mb-10">
+        <h1 class="text-4xl md:text-6xl font-bold text-[#FFDA9E] mb-4 max-w-5xl">
+          Unlocking Africa’s Growth Corridor
         </h1>
         
         <p class="text-white text-lg md:text-xl mb-8 max-w-5xl">
@@ -38,11 +38,18 @@
       <JoinSection/>
      </div>
      <div>
+      <WhyThisMatters/>
+     </div>
+     <div>
       <InfoSection/>
      </div>
+      
      
     
   </div>
+  <div>
+        <Footer/> 
+      </div>
 </template>
 
 <script setup>
@@ -50,6 +57,8 @@ import Navbar from '@/Components/Navbar.vue'
 import VideoSection from '@/Components/VideoSection.vue'
 import InfoSection from '../Components/InfoSection.vue';
 import JoinSection from '../Components/JoinSection.vue';
+import WhyThisMatters from '../Components/WhyThisMatters.vue';
+import Footer from '../Components/Footer.vue';
 const downloadThesis = () => {
   const link = document.createElement('a')
   link.href = '/thesis.pdf'

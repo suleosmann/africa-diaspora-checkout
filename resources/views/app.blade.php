@@ -1,11 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="overflow-x-hidden">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <script src="https://js.paystack.co/v1/inline.js" defer></script>
-
 
     <title inertia>Africa Diaspora Checkout</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -18,7 +17,7 @@
         <img 
             src="/bg1.png" 
             alt="" 
-            class="absolute  top-1/2 -translate-y-1/2 w-[300px] h-auto opacity-10"
+            class="absolute top-1/2 -translate-y-1/2 w-[300px] max-w-[80vw] h-auto opacity-10"
         >
     </div>
     
@@ -27,15 +26,13 @@
         <img 
             src="/bg2.png" 
             alt="" 
-            class="absolute -right-[0.05%] top-1/2 -translate-y-1/2 w-[300px] h-auto opacity-10"
+            class="absolute right-0 top-1/2 -translate-y-1/2 w-[300px] max-w-[80vw] h-auto opacity-10"
         >
     </div>
     
     <!-- Main Content -->
-    <div class="relative z-10">
+    <div class="relative z-10 overflow-x-hidden">
         @inertia
     </div>
-
-    
 </body>
 </html>

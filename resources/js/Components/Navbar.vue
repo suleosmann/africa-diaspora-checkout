@@ -22,7 +22,7 @@
                 </Link>
                 <a 
                     href="/register"
-                    class="text-[#FFDA9E] transition-colors text-sm"
+                    class="text-[#3D2817] bg-[#FFDA9E] transition-colors text-sm border-2 border-[#FFDA9E] px-6 py-2 rounded-lg hover:bg-[#3D2817] hover:text-[#FFDA9E] font-bold"
                 >
                     Join Today
                 </a>

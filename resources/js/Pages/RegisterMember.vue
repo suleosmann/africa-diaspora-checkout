@@ -14,14 +14,14 @@
       <!-- Registration Form -->
       <form @submit.prevent="submit" class="space-y-5">
         <div class="grid grid-cols-2 gap-4">
-          <!-- Full Name -->
+          <!-- First Name -->
           <div>
-            <label class="block text-sm font-semibold text-gray-900 mb-2">Full Name</label>
+            <label class="block text-sm font-semibold text-gray-900 mb-2">First Name</label>
             <div class="relative">
               <input
-                v-model="form.name"
+                v-model="form.first_name"
                 type="text"
-                placeholder="Enter your full name"
+                placeholder="Enter your first name"
                 class="w-full rounded-lg border-0 bg-white shadow-sm py-3 px-4 pr-10 text-gray-900 placeholder:text-gray-400 focus:ring-2 focus:ring-[#FFDA9E]"
                 required
               />
@@ -29,17 +29,81 @@
                 <i class="fa fa-user"></i>
               </span>
             </div>
-            <p v-if="form.errors.name" class="text-red-600 text-sm mt-1">{{ form.errors.name }}</p>
+            <p v-if="form.errors.first_name" class="text-red-600 text-sm mt-1">{{ form.errors.first_name }}</p>
           </div>
 
-          <!-- Phone Number -->
+          <!-- Last Name -->
           <div>
-            <label class="block text-sm font-semibold text-gray-900 mb-2">Phone Number</label>
+            <label class="block text-sm font-semibold text-gray-900 mb-2">Last Name</label>
             <div class="relative">
               <input
-                v-model="form.phone"
+                v-model="form.last_name"
                 type="text"
-                placeholder="Enter phone number"
+                placeholder="Enter your last name"
+                class="w-full rounded-lg border-0 bg-white shadow-sm py-3 px-4 pr-10 text-gray-900 placeholder:text-gray-400 focus:ring-2 focus:ring-[#FFDA9E]"
+                required
+              />
+              <span class="absolute inset-y-0 right-3 flex items-center text-gray-900">
+                <i class="fa fa-user"></i>
+              </span>
+            </div>
+            <p v-if="form.errors.last_name" class="text-red-600 text-sm mt-1">{{ form.errors.last_name }}</p>
+          </div>
+        </div>
+
+        <!-- Phone Number with Country Code (Full Width) -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-900 mb-2">Phone Number</label>
+          <div class="flex gap-2">
+            <!-- Country Code Dropdown -->
+            <div class="relative w-32">
+              <button
+                @click="showPhoneDropdown = !showPhoneDropdown"
+                @blur="hidePhoneDropdown"
+                type="button"
+                class="w-full rounded-lg border-0 bg-white shadow-sm py-3 px-3 text-gray-900 focus:ring-2 focus:ring-[#FFDA9E] flex items-center justify-between"
+              >
+                <span class="flex items-center gap-1 text-sm">
+                  <span>{{ selectedCountryCode.flag }}</span>
+                  <span>{{ selectedCountryCode.dial_code }}</span>
+                </span>
+                <i class="fa fa-chevron-down text-xs"></i>
+              </button>
+              
+              <!-- Phone Code Dropdown -->
+              <div 
+                v-if="showPhoneDropdown"
+                class="absolute z-50 w-72 mt-1 bg-white rounded-lg shadow-lg max-h-60 overflow-y-auto border border-gray-200"
+              >
+                <div class="sticky top-0 bg-white z-10">
+                  <input
+                    v-model="phoneSearchQuery"
+                    @click.stop
+                    @mousedown.stop
+                    type="text"
+                    placeholder="Search country..."
+                    class="w-full border-b border-gray-200 px-3 py-2 text-sm focus:outline-none bg-white"
+                  />
+                </div>
+                <div
+                  v-for="country in filteredPhoneCodes"
+                  :key="country.cca2"
+                  @mousedown="selectPhoneCode(country)"
+                  class="px-3 py-2 hover:bg-[#FFDA9E] cursor-pointer text-sm flex items-center gap-2"
+                >
+                  <span>{{ country.flag }}</span>
+                  <span class="flex-1">{{ country.name }}</span>
+                  <span class="text-gray-600">{{ country.dial_code }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Phone Number Input -->
+            <div class="flex-1 relative">
+              <input
+                v-model="form.phone"
+                type="tel"
+                placeholder="712345678"
                 class="w-full rounded-lg border-0 bg-white shadow-sm py-3 px-4 pr-10 text-gray-900 placeholder:text-gray-400 focus:ring-2 focus:ring-[#FFDA9E]"
                 required
               />
@@ -47,8 +111,8 @@
                 <i class="fa fa-phone"></i>
               </span>
             </div>
-            <p v-if="form.errors.phone" class="text-red-600 text-sm mt-1">{{ form.errors.phone }}</p>
           </div>
+          <p v-if="form.errors.phone" class="text-red-600 text-sm mt-1">{{ form.errors.phone }}</p>
         </div>
 
         <div class="grid grid-cols-2 gap-4">
@@ -231,12 +295,85 @@ const countries = ref([])
 const searchQuery = ref('')
 const showDropdown = ref(false)
 
+// Phone code dropdown
+const showPhoneDropdown = ref(false)
+const phoneSearchQuery = ref('')
+const countriesWithDialCodes = ref([])
+const selectedCountryCode = ref({
+  name: 'United States',
+  dial_code: '+1',
+  cca2: 'US',
+  flag: '🇺🇸'
+})
+
+// Helper function to get flag emoji from country code
+const getFlagEmoji = (countryCode) => {
+  if (!countryCode) return ''
+  const codePoints = countryCode
+    .toUpperCase()
+    .split('')
+    .map(char => 127397 + char.charCodeAt())
+  return String.fromCodePoint(...codePoints)
+}
+
 onMounted(async () => {
   const worldCountries = await import('world-countries')
+  
+  // For the region dropdown
   countries.value = worldCountries.default
     .map(country => country.name.common)
     .sort()
+  
+  // For phone codes - extract dial codes and create proper structure
+  countriesWithDialCodes.value = worldCountries.default
+    .map(country => {
+      // Get the full dial code
+      const root = country.idd.root || ''
+      const suffixes = country.idd.suffixes || []
+      
+      // For countries like US with multiple suffixes, just use the root
+      const dial_code = suffixes.length === 0 || suffixes.length > 1 
+        ? root 
+        : root + suffixes[0]
+      
+      return {
+        name: country.name.common,
+        cca2: country.cca2,
+        dial_code: dial_code,
+        flag: getFlagEmoji(country.cca2)
+      }
+    })
+    .filter(country => country.dial_code && country.dial_code !== '+') // Filter out countries without dial codes
+    .sort((a, b) => a.name.localeCompare(b.name))
+  
+  // Set United States as default
+  const usa = countriesWithDialCodes.value.find(c => c.cca2 === 'US')
+  if (usa) {
+    selectedCountryCode.value = usa
+    form.country_code = usa.dial_code
+  }
 })
+
+const filteredPhoneCodes = computed(() => {
+  if (!phoneSearchQuery.value) return countriesWithDialCodes.value
+  return countriesWithDialCodes.value.filter(country => 
+    country.name.toLowerCase().includes(phoneSearchQuery.value.toLowerCase()) ||
+    country.dial_code.includes(phoneSearchQuery.value)
+  )
+})
+
+const selectPhoneCode = (country) => {
+  selectedCountryCode.value = country
+  form.country_code = country.dial_code
+  showPhoneDropdown.value = false
+  phoneSearchQuery.value = ''
+}
+
+const hidePhoneDropdown = () => {
+  setTimeout(() => {
+    showPhoneDropdown.value = false
+  }, 200)
+}
 
 const filteredCountries = computed(() => {
   if (!searchQuery.value) return countries.value
@@ -258,8 +395,10 @@ const hideDropdown = () => {
 }
 
 const form = useForm({
-  name: '',
+  first_name: '',
+  last_name: '',
   phone: '',
+  country_code: '+1',
   email: '',
   industry: '',
   region: '',
@@ -285,7 +424,13 @@ const getMembershipButtonText = () => {
 }
 
 async function submit() {
-  console.log('🟡 Submitting form:', form.data())
+  // Combine first and last name for backend
+  const submitData = {
+    ...form.data(),
+    name: `${form.first_name} ${form.last_name}`.trim()
+  }
+  
+  console.log('🟡 Submitting form:', submitData)
 
   if (form.register_type === null) {
     alert('⚠️ Please select a membership type')
@@ -295,7 +440,7 @@ async function submit() {
   form.processing = true
 
   try {
-    const response = await axios.post('/register-member', form.data())
+    const response = await axios.post('/register-member', submitData)
     const data = response.data
 
     console.log('✅ Member registered:', data)
@@ -336,7 +481,7 @@ async function submit() {
           {
             display_name: 'Member Name',
             variable_name: 'member_name',
-            value: form.name
+            value: submitData.name
           },
           {
             display_name: 'Membership Type',
