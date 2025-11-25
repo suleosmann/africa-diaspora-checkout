@@ -74,14 +74,7 @@
         </li>
       </ul>
 
-      <!-- Footer -->
-      <div class="flex justify-between items-center pt-8 border-t border-gray-300 text-sm text-gray-900">
-        <div class="flex gap-8">
-          <a href="#" class="hover:underline">Privacy Policy</a>
-          <a href="#" class="hover:underline">Terms & Conditions</a>
-        </div>
-        <p class="text-right">All Rights Reserved. Africa & Diaspora Economic Network. All Rights reserved.</p>
-      </div>
+      
     </div>
   </div>
 </template>
