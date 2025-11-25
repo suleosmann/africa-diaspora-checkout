@@ -64,7 +64,22 @@
 
           <!-- Second Paragraph -->
           <p class="text-base md:text-lg lg:text-xl text-gray-900 leading-relaxed">
-            The Great Equatorial Land Bridge (GELB) is an African Union—endorsed mega-initiative designed to create a continuous multi-modal transport and energy corridor connecting the Indian Ocean to the Atlantic Ocean. Africa's Most Transformative Maritime, Logistics & Eco-Urban Investment Platform in line with AU Agenda 2063. This it to unlocking trade, investment, and regional integration, while stimulating urbanisation, industrialisation, knowledge economy development, and job creation along the route.
+            The Great Equatorial Land Bridge (GELB) is a visionary and ambitious multi-national infrastructure and economic development corridor proposed to span Central Africa, connecting the Atlantic and Indian Oceans. It represents one of the most significant and transformative development projects conceived for the African continent.
+          </p>
+
+          <!-- Third Paragraph -->
+          <p class="text-base md:text-lg lg:text-xl text-gray-900 leading-relaxed">
+            More than just a transport route, the GELB is envisioned as a comprehensive "development corridor" designed to unlock the immense economic potential of the African heartland, foster unprecedented regional integration, and create a sustainable, self-sufficient economic ecosystem.
+          </p>
+
+          <!-- Fourth Paragraph -->
+          <p class="text-base md:text-lg lg:text-xl text-gray-900 leading-relaxed">
+            The core justification for the project stems from the need to overcome one of Africa's most profound historical challenges: the lack of high-capacity, reliable east-west infrastructure.
+          </p>
+
+          <!-- Fifth Paragraph -->
+          <p class="text-base md:text-lg lg:text-xl text-gray-900 leading-relaxed">
+            By creating this land bridge, the project aims to dramatically reduce transport costs and times, link landlocked countries to global markets, stimulate industrialization and value-addition, and serve as a powerful catalyst for peace, stability, and shared prosperity across the continent.
           </p>
         </div>
 

@@ -1,5 +1,5 @@
 <template>
-  <div class="relative min-h-[60vh] bg-cover bg-center bg-no-repeat -mt-16 " 
+  <div class="relative  bg-cover bg-center bg-no-repeat -mt-16 " 
        style="background-image: url('/globe.avif');">
     <!-- Dark overlay -->
     <div class="absolute inset-0 bg-black/50 z-0"></div>
@@ -11,7 +11,7 @@
       </div>
       
       <!-- Hero Section -->
-      <div class="flex flex-col items-center justify-center text-center px-6 mt-16 mb-10">
+      <div class="flex flex-col items-center justify-center text-center px-6 mt-16 mb-28">
         <h1 class="text-4xl md:text-6xl font-bold text-[#FFDA9E] mb-4 max-w-5xl">
           Unlocking Africa’s Growth Corridor
         </h1>
@@ -43,6 +43,9 @@
      <div>
       <InfoSection/>
      </div>
+     <div>
+      <FutureSection/>
+     </div>
       
      
     
@@ -59,6 +62,8 @@ import InfoSection from '../Components/InfoSection.vue';
 import JoinSection from '../Components/JoinSection.vue';
 import WhyThisMatters from '../Components/WhyThisMatters.vue';
 import Footer from '../Components/Footer.vue';
+import FutureSection
+ from '../Components/FutureSection.vue';
 const downloadThesis = () => {
   const link = document.createElement('a')
   link.href = '/thesis.pdf'
