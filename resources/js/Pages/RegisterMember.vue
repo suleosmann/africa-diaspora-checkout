@@ -204,7 +204,7 @@
               />
             </div>
             <p class="font-bold text-[#3D2817] text-sm">Join Network</p>
-            <p class="text-xs text-gray-700 mt-0.5">Basic access</p>
+            <!-- <p class="text-xs text-gray-700 mt-0.5">Basic access</p> -->
           </div>
 
           <!-- Become Member -->
@@ -224,8 +224,8 @@
                 class="text-[#3D2817] focus:ring-[#FFDA9E]"
               />
             </div>
-            <p class="font-bold text-[#3D2817] text-sm whitespace-nowrap">Become Member</p>
-            <p class="text-xs text-gray-700 mt-0.5">Download access</p>
+            <p class="font-bold text-[#3D2817] text-sm whitespace-nowrap">⁠Download thesis</p>
+            <!-- <p class="text-xs text-gray-700 mt-0.5">Become Member</p> -->
           </div>
 
           <!-- Premier Membership -->
