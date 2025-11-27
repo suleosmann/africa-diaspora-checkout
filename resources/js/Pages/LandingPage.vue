@@ -1,6 +1,6 @@
 <template>
-  <div class="relative  bg-cover bg-center bg-no-repeat -mt-16 " 
-       style="background-image: url('/globe.avif');">
+  <div class="relative bg-no-repeat -mt-16 w-full" 
+     style="background-image: url('/bg13.jpg'); background-size: 100% auto; background-position: top center;">
     <!-- Dark overlay -->
     <div class="absolute inset-0 bg-black/50 z-0"></div>
     

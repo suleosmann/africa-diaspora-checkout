@@ -8,7 +8,7 @@
         <div class="hidden lg:block">
           <div 
             class="w-full h-full bg-cover bg-center"
-            style="background-image: url('/bg6.jpg');"
+            style="background-image: url('/bg12.jpg');"
           ></div>
         </div>
 

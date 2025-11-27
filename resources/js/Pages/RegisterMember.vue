@@ -245,7 +245,7 @@
                 class="text-[#3D2817] focus:ring-[#FFDA9E]"
               />
             </div>
-            <p class="font-bold text-[#3D2817] text-sm">Premier Membership</p>
+            <p class="font-bold text-[#3D2817] text-sm">Premium Membership</p>
             <p class="text-xs text-gray-700 mt-0.5">$350/year</p>
           </div>
         </div>
