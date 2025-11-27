@@ -7,8 +7,7 @@
     <div class="relative z-10 max-w-7xl mx-auto px-6">
       <!-- Title -->
       <h2 class="text-4xl md:text-5xl font-bold text-[#FFDA9E] mb-12">
-          Core Components<br/>
-          (Global-Investor Ready)
+          LAMU PORT SEZ CORE COMPONENTS
       </h2>
 
       <!-- Tabs Layout -->
@@ -222,12 +221,12 @@
 
             <!-- Power Supply Content -->
             <div v-if="activeTab === 3" class="space-y-6">
-              <div>
+              <!-- <div>
                 <h3 class="text-2xl font-bold text-[#3D2817] mb-4">Shore Power</h3>
                 <p class="text-[#3D2817] leading-relaxed">
                   Emission reduction: 60–70% during berth. Shore power is a new African frontier, growing demand + green financing + carbon credit revenue streams.
                 </p>
-              </div>
+              </div> -->
 
               <div>
                 <h3 class="text-2xl font-bold text-[#3D2817] mb-4">Fresh Water & Waste Reception</h3>

@@ -82,7 +82,7 @@
 </template>
 
 <script setup>
-import Navbar from '@/Components/Navbar.vue'
+import Navbar from '@/Components/Navbar2.vue'
 import { onMounted } from 'vue'
 
 // Auto download on page load

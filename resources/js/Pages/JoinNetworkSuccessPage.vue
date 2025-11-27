@@ -67,6 +67,6 @@
 
 <script setup>
 //
-import Navbar from '@/Components/Navbar.vue'
+import Navbar from '@/Components/Navbar2.vue'
 
 </script>

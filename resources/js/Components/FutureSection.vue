@@ -29,8 +29,7 @@
           <div>
             <h2 class="text-xl font-bold text-gray-900 mb-2 underline">Premium Membership Benefits:</h2>
             <p class="text-gray-900 text-base leading-relaxed">
-              Is your Success building a Legacy? If you are looking for a trusted way to channel your financial investments to viable infrastructure 
-              projects in Africa, go Gold.
+              Is your Success building a Legacy? An ADEN membership gives you a trusted way to channel your financial investments to viable large infrastructure projects in Africa, go Gold.
             </p>
           </div>
 
@@ -38,7 +37,15 @@
           <ul class="space-y-3 text-gray-900 text-sm leading-relaxed">
             <li class="flex gap-2">
               <span class="mt-1">•</span>
-              <span>You will be the first to know about Co-Investment Opportunities on specific Afri Fund Capital deals, where applicable.</span>
+              <span>You will be the first to know about Co-Investment Opportunities on specific Afri Fund Capital projects in the sector of your interest, where applicable.</span>
+            </li>
+            <li class="flex gap-2">
+              <span class="mt-1">•</span>
+              <span>You will have an opportunity to co - invest with other ADEN members in Afri Funds broad investment coupons of Development REITS, Infrastructure Bonds, Commercial Real Estate Papers</span>
+            </li>
+            <li class="flex gap-2">
+              <span class="mt-1">•</span>
+              <span>You will get access to Afri Funds real Commercial and Industrial real Estate opportunities unit investments</span>
             </li>
             <li class="flex gap-2">
               <span class="mt-1">•</span>
@@ -47,10 +54,6 @@
             <li class="flex gap-2">
               <span class="mt-1">•</span>
               <span>Exclusive monthly upcoming "Deal-Flow" Briefings on sectors evaluated by Afri Fund Capital.</span>
-            </li>
-            <li class="flex gap-2">
-              <span class="mt-1">•</span>
-              <span>Co-Investment Opportunities on specific Afri Fund Capital deals.</span>
             </li>
             <li class="flex gap-2">
               <span class="mt-1">•</span>

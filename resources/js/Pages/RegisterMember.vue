@@ -282,7 +282,7 @@
 </template>
 
 <script setup>
-import Navbar from '@/Components/Navbar.vue'
+import Navbar from '@/Components/Navbar2.vue'
 import { useForm } from '@inertiajs/vue3'
 import axios from 'axios'
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'

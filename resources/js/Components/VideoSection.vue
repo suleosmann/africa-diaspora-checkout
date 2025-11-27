@@ -33,25 +33,30 @@
       <div class="space-y-6 text-base md:text-lg text-gray-900 leading-relaxed">
         <!-- First Paragraph -->
         <p>
-          Afri Fund Capital, through Aden, serves as the strategic gateway connecting investors, changemakers and visionaries to credible information, vetted opportunities, and meaningful participation in the "Let's Build Africa" investment movement.
+          Afri Fund Capital, through ADEN, serves as the strategic gateway connecting investors, changemakers and visionaries to credible information, vetted opportunities, and meaningful participation in the "Let's Build Africa" investment movement.
         </p>
 
         <!-- Second Paragraph -->
         <p>
-          The Great Equatorial Land Bridge (GELB) is a visionary and ambitious multi-national infrastructure and economic development corridor proposed to span Central Africa, connecting the Atlantic and Indian Oceans. It represents one of the most significant and transformative development projects conceived for the African continent.
+          Afri Fund Capital is leading a consortium of 12 global partners in developing one of the most ambitious infrastructure projects in Africa, the GELB, Africa's smart economic corridor.
         </p>
 
         <!-- Third Paragraph -->
         <p>
-          More than just a transport route, the GELB is envisioned as a comprehensive "development corridor" designed to unlock the immense economic potential of the African heartland, foster unprecedented regional integration, and create a sustainable, self-sufficient economic ecosystem.
+          The Great Equatorial Land Bridge (GELB) is a visionary and ambitious multi-national infrastructure and economic development corridor proposed to span Central Africa, connecting the Atlantic and Indian Oceans. It represents one of the most significant and transformative development projects conceived for the African continent.
         </p>
 
         <!-- Fourth Paragraph -->
         <p>
-          The core justification for the project stems from the need to overcome one of Africa's most profound historical challenges: the lack of high-capacity, reliable east-west infrastructure.
+          More than just a transport route, the GELB is envisioned as a comprehensive "development corridor" designed to unlock the immense economic potential of the African heartland, foster unprecedented regional integration, and create a sustainable, self-sufficient economic ecosystem.
         </p>
 
         <!-- Fifth Paragraph -->
+        <p>
+          The core justification for the project stems from the need to overcome one of Africa's most profound historical challenges: the lack of high-capacity, reliable east-west infrastructure.
+        </p>
+
+        <!-- Sixth Paragraph -->
         <p>
           By creating this land bridge, the project aims to dramatically reduce transport costs and times, link landlocked countries to global markets, stimulate industrialization and value-addition, and serve as a powerful catalyst for peace, stability, and shared prosperity across the continent.
         </p>
