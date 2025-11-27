@@ -1,5 +1,5 @@
 <template>
-    <nav class="bg-[#3D2817] py-6 px-6 rounded-2xl max-w-6xl mx-auto mt-6">
+    <nav class="backdrop-blur-xl bg-white/10 py-6 px-6 rounded-2xl max-w-6xl mx-auto mt-6 border border-white/20 shadow-2xl">
         <div class="flex items-center justify-between">
             <!-- Logo Section -->
             <div class="flex items-center gap-3">
@@ -7,7 +7,7 @@
                 <img 
                     :src="logoUrl" 
                     alt="ADEN Logo" 
-                    class="h-10 w-auto"
+                    class="h-10 w-auto drop-shadow-lg"
                 >
                 </a>
             </div>
@@ -16,13 +16,13 @@
             <div class="flex items-center gap-8 mr-6 font-semibold">
                 <Link 
                     href="/" 
-                    class="text-[#FFDA9E] transition-colors text-sm"
+                    class="text-[#FFDA9E] transition-all text-sm hover:text-white drop-shadow-md"
                 >
                     About Us
                 </Link>
                 <a 
                     href="/register"
-                    class="text-[#3D2817] bg-[#FFDA9E] transition-colors text-sm border-2 border-[#FFDA9E] px-6 py-2 rounded-lg hover:bg-[#3D2817] hover:text-[#FFDA9E] font-bold"
+                    class="text-[#3D2817] bg-[#FFDA9E]/90 backdrop-blur-sm transition-all text-sm border-2 border-[#FFDA9E] px-6 py-2 rounded-lg hover:bg-[#FFDA9E] hover:scale-105 font-bold shadow-lg"
                 >
                     Join Today
                 </a>
@@ -45,6 +45,13 @@ const isActive = (path) => {
 
 <style scoped>
 nav {
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 
+        0 8px 32px 0 rgba(0, 0, 0, 0.37),
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
+    background: linear-gradient(
+        135deg,
+        rgba(61, 40, 23, 0.15) 0%,
+        rgba(61, 40, 23, 0.1) 100%
+    );
 }
 </style>
