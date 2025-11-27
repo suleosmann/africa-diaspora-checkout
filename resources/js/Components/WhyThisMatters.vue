@@ -1,7 +1,7 @@
 <template>
-  <div class="relative min-h-sch-[60vh] py-16" style="background-image: url('/bg4.jpg'); background-size: cover; background-position: center;">
+  <div class="relative min-h-[60vh] py-16" style="background-image: url('/bg9.png'); background-size: cover; background-position: center;">
     <!-- White Overlay -->
-    <div class="absolute inset-0 bg-white/80 z-0"></div>
+    <div class="absolute inset-0 bg-white/60 z-0"></div>
     
     <!-- Content -->
     <div class="relative z-10 max-w-7xl mx-auto px-6">
@@ -102,11 +102,12 @@ const tabs = [
   {
     title: 'Why Lamu Port SEZ City Is the Entry Point',
     content: [
+      "Lamu Port SEZ City, being one of the major components of the eastern anchor of GELB, is envisioned to transform Kenya's northern coastline into a world-class maritime, industrial, and eco-urban hub, combining port operations, special economic zones (SEZs), logistics networks, and hospitality infrastructure.",
+      "This development will also anchor the LAPSSET Corridor, positioning Lamu as a regional trade gateway linking East Africa to global markets.",
+      "Lamu Port SEZ City is a premier transshipment, manufacturing, and logistics centre in Africa, driving regional integration, sustainable industrialization, and blue economy growth.",
       "Positions Kenya as a premier gateway to East, Central, and West Africa.",
       "Integrates port, logistics, rail, SEZ, and eco-city development.",
-      "Offers multi-sector investment opportunities with high returns backed by continental demand.",
-      "Lamu Port SEZ City is envisioned to transform Kenya's northern coastline into a world-class maritime, industrial, and eco-urban hub, combining port operations, special economic zones (SEZs), logistics networks, and hospitality infrastructure.",
-      "This development will anchor the LAPSSET Corridor, positioning Lamu as a regional trade gateway linking East Africa to global markets."
+      "Offers multi-sector investment opportunities with high returns backed by continental demand."
     ],
     showCTA: true
   }

@@ -16,7 +16,7 @@
 
             <!-- Description -->
             <p class="text-[#FFDA9E] text-sm md:text-base leading-relaxed">
-              Africa today sits at the center of one of the largest economic transformations of the 21st century, and the Great Equatorial Land Bridge (GELB) is positioned as a flagship catalyst of this shift. The GELB Corridor—linking <span class="font-bold">Lamu (Kenya) to Douala (Cameroon)</span> through <span class="font-bold">South Sudan</span> and the <span class="font-bold">Central African Republic</span>—is endorsed by the African Union as a continental-scale logistics, transport, and energy backbone. The Lamu Port SEZ City serves as the eastern anchor, integrating maritime infrastructure, SEZ-driven industrialization, and green urban development to drive regional growth.
+              Africa today sits at the center of one of the largest economic transformations of the 21st century, and the Great Equatorial Land Bridge (GELB) is positioned as a flagship catalyst of this shift. The GELB Corridor—linking <span class="font-bold">Lamu port (Kenya) to Douala port (Cameroon)</span> through <span class="font-bold">South Sudan</span> and the <span class="font-bold">Central African Republic</span>—is endorsed by the African Union as a continental-scale logistics, transport, and energy backbone. The Lamu Port SEZ City serves as the eastern anchor, integrating maritime infrastructure, SEZ-driven industrialization, and green urban development to drive regional growth.
             </p>
 
             <!-- CTA Button -->
@@ -34,7 +34,7 @@
           <div class="hidden lg:block lg:col-span-4 h-full">
             <div 
               class="w-full h-full bg-cover bg-center"
-              style="background-image: url('/bg7.jpg');"
+              style="background-image: url('/bg8.png');"
             ></div>
           </div>
 
