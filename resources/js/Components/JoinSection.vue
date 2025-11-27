@@ -34,7 +34,7 @@
           <div class="hidden lg:block lg:col-span-4 h-full">
             <div 
               class="w-full h-full bg-cover bg-center"
-              style="background-image: url('/bg8.png');"
+              style="background-image: url('/bg10.png');"
             ></div>
           </div>
 

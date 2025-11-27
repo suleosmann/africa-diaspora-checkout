@@ -1,7 +1,7 @@
 <template>
-  <div class="relative min-h-[60vh] py-16" style="background-image: url('/bg9.png'); background-size: cover; background-position: center;">
+  <div class="relative min-h-[60vh] py-16" style="background-image: url('/bg11.jpg'); background-size: cover; background-position: center;">
     <!-- White Overlay -->
-    <div class="absolute inset-0 bg-white/60 z-0"></div>
+    <div class="absolute inset-0 bg-white/80 z-0"></div>
     
     <!-- Content -->
     <div class="relative z-10 max-w-7xl mx-auto px-6">
