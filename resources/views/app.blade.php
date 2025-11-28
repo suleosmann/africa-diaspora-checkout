@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <script src="https://js.paystack.co/v1/inline.js" defer></script>
+    <link rel="icon" type="image/png" href="/favicon.svg">
+
 
     <title inertia>Africa Diaspora Checkout</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
