@@ -22,7 +22,7 @@
         
         <a 
           href="/register"
-          class="inline-block bg-[#3D2817] hover:bg-[#2a1d13] text-[#FFDA9E] font-semibold px-12 sm:px-24 py-4 rounded-2xl text-base sm:text-lg transition-all border-2 border-[#FFDA9E]"
+          class="inline-block bg-[#FFDA9E] hover:bg-[#ffd180] text-[#3D2817] font-semibold px-12 sm:px-24 py-4 rounded-2xl text-base sm:text-lg transition-all border-2 border-[#FFDA9E]"
         >
           Let's Build Africa | Join ADEN Today
         </a>
