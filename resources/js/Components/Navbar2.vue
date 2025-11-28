@@ -3,7 +3,7 @@
         <div class="flex items-center justify-between">
             <!-- Logo Section -->
             <div class="flex items-center gap-3">
-                <a href="/">
+                <a href="https://aden.africa/">
                 <img 
                     :src="logoUrl" 
                     alt="ADEN Logo" 

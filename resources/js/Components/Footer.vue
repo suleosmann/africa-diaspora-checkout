@@ -5,10 +5,10 @@
         
         <!-- Left Side - Links -->
         <div class="flex space-x-8">
-          <a href="/privacy-policy" class="text-[#3D2817] hover:text-[#5A3D2B] font-medium transition-colors">
+          <a href="https://aden.africa/terms-and-conditions" class="text-[#3D2817] hover:text-[#5A3D2B] font-medium transition-colors">
             Privacy Policy
           </a>
-          <a href="/terms-conditions" class="text-[#3D2817] hover:text-[#5A3D2B] font-medium transition-colors">
+          <a href="https://aden.africa/terms-and-conditions" class="text-[#3D2817] hover:text-[#5A3D2B] font-medium transition-colors">
             Terms & Conditions
           </a>
         </div>
