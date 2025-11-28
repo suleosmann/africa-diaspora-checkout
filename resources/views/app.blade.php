@@ -8,7 +8,7 @@
     <link rel="icon" type="image/png" href="/favicon.svg">
 
 
-    <title inertia>Africa Diaspora Checkout</title>
+    <title inertia>Aden Africa</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     
     @inertiaHead
