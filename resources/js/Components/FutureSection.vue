@@ -1,5 +1,5 @@
 <template>
-  <div class="relative min-h-screen bg-[#f0e9d7] py-20">
+  <div class="relative min-h-screen bg-[#fff0d8] py-20">
     <!-- Content -->
     <div class="relative z-10 max-w-7xl mx-auto pr-6">
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-0 items-stretch min-h-[calc(100vh-10rem)]">

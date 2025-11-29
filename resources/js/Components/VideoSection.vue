@@ -1,5 +1,5 @@
 <template>
-  <div class="relative min-h-[70vh] bg-[#f0e9d7] py-12">
+  <div class="relative min-h-[70vh] bg-[#fff0d8] py-12">
     <div style="background-image: url('/belowheader.png');" class="absolute top-0 left-0 right-0 h-16 bg-repeat-x"></div>
     
     <!-- Background Pattern - Right Side -->
@@ -14,17 +14,17 @@
     <!-- Content -->
     <div class="relative z-10 max-w-7xl mx-auto px-6 py-8 mt-8">
       <!-- Video floated left -->
-      <div class="float-left mr-8 mb-6 w-full md:w-[600px]">
+      <div class="float-left mr-8 mb-6 w-full md:w-[600px] mt-6">
         <div class="rounded-2xl overflow-hidden shadow-xl">
           <iframe 
             width="100%" 
-            height="400" 
+            height="338" 
             src="https://www.youtube.com/embed/wbsbYT484yo" 
             title="YouTube video player" 
             frameborder="0" 
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
             allowfullscreen
-            class="w-full aspect-video"
+            class="w-full aspect-[16/9]"
           ></iframe>
         </div>
       </div>
