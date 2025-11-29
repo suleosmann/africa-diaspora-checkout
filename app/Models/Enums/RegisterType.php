@@ -6,7 +6,7 @@ enum RegisterType: int
 {
     case FREE = 0;
     case DOWNLOAD = 1;
-    case CONTRIBUTE  = -1;
+    case CONTRIBUTE  = 2;
 
     public function label(): string
     {
