@@ -1,5 +1,5 @@
 <template>
-  <Navbar/>
+  <Navbar2/>
   <div class="min-h-screen  flex items-center justify-center -mt-20 p-6">
 
     <div class="w-full max-w-md bg-[#FFDA9E] shadow-xl border border-[#3D2817] rounded-2xl p-8 text-center relative z-10">
@@ -59,7 +59,7 @@
 </template>
 
 <script setup>
-import Navbar from '@/Components/Navbar.vue'
+import Navbar2 from '@/Components/Navbar2.vue'
 
 defineProps({
   data: Object,

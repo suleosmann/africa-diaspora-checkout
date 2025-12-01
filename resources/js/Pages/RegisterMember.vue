@@ -132,15 +132,17 @@
 
           <!-- Country Searchable Dropdown -->
           <div class="relative">
-            <label class="block text-sm font-semibold text-gray-900 mb-2">Country</label>
+            <label class="block text-sm font-semibold text-gray-900 mb-2">Country <span class="text-red-600">*</span></label>
             <div class="relative">
               <input
-                v-model="searchQuery"
-                @focus="showDropdown = true"
+                v-model="form.region"
+                @input="searchQuery = form.region; showDropdown = true"
+                @focus="searchQuery = form.region; showDropdown = true"
                 @blur="hideDropdown"
                 type="text"
                 placeholder="Search country..."
                 class="w-full rounded-lg border-0 bg-white shadow-sm py-3 px-4 pr-10 text-gray-900 placeholder:text-gray-400 focus:ring-2 focus:ring-[#FFDA9E]"
+                required
               />
               <span class="absolute inset-y-0 right-3 flex items-center text-gray-900 pointer-events-none">
                 <i class="fa fa-chevron-down"></i>
@@ -161,6 +163,7 @@
                 </div>
               </div>
             </div>
+            <p v-if="form.errors.region" class="text-red-600 text-sm mt-1">{{ form.errors.region }}</p>
           </div>
         </div>
 
@@ -382,15 +385,16 @@ const selectPhoneCode = (country) => {
 }
 
 const filteredCountries = computed(() => {
-  if (!searchQuery.value) return countries.value
+  const query = searchQuery.value || form.region
+  if (!query) return countries.value
   return countries.value.filter(country => 
-    country.toLowerCase().includes(searchQuery.value.toLowerCase())
+    country.toLowerCase().includes(query.toLowerCase())
   )
 })
 
 const selectCountry = (country) => {
   form.region = country
-  searchQuery.value = country
+  searchQuery.value = ''
   showDropdown.value = false
 }
 

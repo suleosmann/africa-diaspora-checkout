@@ -24,13 +24,14 @@ class MemberRegistrationController extends Controller
                 'phone' => ['required', 'string', 'max:20'],
                 'country_code' => ['required', 'string', 'max:10'],
                 'industry' => ['nullable', 'string', 'max:255'],
-                'region' => ['nullable', 'string', 'max:255'],
+                'region' => ['required', 'string', 'max:255'],
                 'register_type' => ['required', 'integer', 'in:0,1,2'],
                 'agree' => ['accepted'],
             ], [
                 'agree.accepted' => 'You must agree to the Terms & Conditions and Privacy Policy.',
                 'register_type.required' => 'Please select a membership type.',
                 'country_code.required' => 'Country code is required.',
+                'region.required' => 'Please select your country.',
             ]);
 
             // Combine country code with phone number
@@ -50,7 +51,7 @@ class MemberRegistrationController extends Controller
                     'name' => $data['name'],
                     'phone' => $fullPhone,
                     'industry_affiliation' => $data['industry'] ?? null,
-                    'region' => $data['region'] ?? null,
+                    'region' => $data['region'],
                     'register_type' => $data['register_type'],
                     'agreed_to_terms' => true,
                     'password' => bcrypt(Str::random(12)),
@@ -63,7 +64,7 @@ class MemberRegistrationController extends Controller
                     'name' => $data['name'],
                     'phone' => $fullPhone,
                     'industry_affiliation' => $data['industry'] ?? null,
-                    'region' => $data['region'] ?? null,
+                    'region' => $data['region'],
                     'agreed_to_terms' => true,
                 ]);
             }
