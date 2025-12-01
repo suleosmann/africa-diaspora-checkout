@@ -106,7 +106,7 @@
                 </div>
 
                 <a 
-                    href="https://membership.aden.africa/"
+                    href="/register"
                     class="text-[#3D2817] bg-[#FFDA9E]/90 backdrop-blur-sm transition-all text-sm border-2 border-[#FFDA9E] px-6 py-2 rounded-lg hover:bg-[#FFDA9E] hover:scale-105 font-bold shadow-lg"
                 >
                     Join Today
@@ -202,7 +202,7 @@
             </div>
 
             <a 
-                href="https://membership.aden.africa/"
+                href="/register"
                 @click="isMenuOpen = false"
                 class="text-[#3D2817] bg-[#FFDA9E]/90 backdrop-blur-sm transition-all text-sm border-2 border-[#FFDA9E] px-6 py-2 rounded-lg hover:bg-[#FFDA9E] font-bold shadow-lg text-center"
             >

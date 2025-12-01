@@ -204,7 +204,6 @@
               />
             </div>
             <p class="font-bold text-[#3D2817] text-sm">Join Network</p>
-            <!-- <p class="text-xs text-gray-700 mt-0.5">Basic access</p> -->
           </div>
 
           <!-- Become Member -->
@@ -225,15 +224,14 @@
               />
             </div>
             <p class="font-bold text-[#3D2817] text-sm whitespace-nowrap">⁠Download thesis</p>
-            <!-- <p class="text-xs text-gray-700 mt-0.5">Become Member</p> -->
           </div>
 
           <!-- Premier Membership -->
           <div 
-            @click="selectMembership(-1)"
+            @click="selectMembership(2)"
             :class="[
               'rounded-lg p-2 border-2 cursor-pointer transition text-center',
-              form.register_type === -1 
+              form.register_type === 2 
                 ? 'border-[#3D2817] bg-[#FFDA9E]' 
                 : 'border-gray-300 bg-white hover:border-gray-400'
             ]"
@@ -241,7 +239,7 @@
             <div class="flex justify-center mb-1">
               <input 
                 type="radio" 
-                :checked="form.register_type === -1"
+                :checked="form.register_type === 2"
                 class="text-[#3D2817] focus:ring-[#FFDA9E]"
               />
             </div>
@@ -253,19 +251,23 @@
       </div>
 
         <!-- Terms -->
-        <div class="flex items-start gap-3">
-          <input 
-            id="agree" 
-            v-model="form.agree" 
-            type="checkbox" 
-            required 
-            class="mt-1 rounded border-gray-300 text-[#3D2817] focus:ring-[#FFDA9E]" 
-          />
-          <label for="agree" class="text-sm text-gray-900">
-            I agree to the
-            <a href="#" class="text-[#3D2817] hover:underline font-semibold">Terms & Conditions</a> and
-            <a href="#" class="text-[#3D2817] hover:underline font-semibold">Privacy Policy</a>
-          </label>
+        <div>
+          <div class="flex items-start gap-3">
+            <input 
+              id="agree" 
+              v-model="form.agree" 
+              type="checkbox" 
+              required 
+              class="mt-1 rounded border-gray-300 text-[#3D2817] focus:ring-[#FFDA9E]" 
+            />
+            <label for="agree" class="text-sm text-gray-900">
+              I agree to the
+              <a href="#" class="text-[#3D2817] hover:underline font-semibold">Terms & Conditions</a> and
+              <a href="#" class="text-[#3D2817] hover:underline font-semibold">Privacy Policy</a>
+              <span class="text-red-600">*</span>
+            </label>
+          </div>
+          <p v-if="form.errors.agree" class="text-red-600 text-sm mt-1">{{ form.errors.agree }}</p>
         </div>
 
         <!-- Submit Button -->
@@ -379,12 +381,6 @@ const selectPhoneCode = (country) => {
   phoneSearchQuery.value = ''
 }
 
-// const hidePhoneDropdown = () => {
-//   setTimeout(() => {
-//     showPhoneDropdown.value = false
-//   }, 200)
-// }
-
 const filteredCountries = computed(() => {
   if (!searchQuery.value) return countries.value
   return countries.value.filter(country => 
@@ -442,8 +438,15 @@ async function submit() {
   
   console.log('🟡 Submitting form:', submitData)
 
+  // ✅ ENFORCE MEMBERSHIP TYPE SELECTION
   if (form.register_type === null) {
     alert('⚠️ Please select a membership type')
+    return
+  }
+
+  // ✅ ENFORCE TERMS & CONDITIONS
+  if (!form.agree) {
+    alert('⚠️ You must agree to the Terms & Conditions and Privacy Policy to continue')
     return
   }
 
@@ -467,7 +470,7 @@ async function submit() {
       return
     }
 
-    // Premier membership (-1) - continue with payment
+    // Premier membership (2) - continue with payment
     if (!PAYSTACK_PUBLIC_KEY) {
       alert('⚠️ Paystack key not configured. Please contact support.')
       form.processing = false
@@ -514,7 +517,21 @@ async function submit() {
 
   } catch (error) {
     console.error('❌ Registration error:', error)
-    alert('Something went wrong. Please try again.')
+    
+    // Handle validation errors from backend
+    if (error.response && error.response.data && error.response.data.errors) {
+      const errors = error.response.data.errors
+      
+      // Show specific error for terms if that's the issue
+      if (errors.agree) {
+        alert('⚠️ You must agree to the Terms & Conditions and Privacy Policy')
+      } else {
+        alert('⚠️ Please check the form for errors and try again.')
+      }
+    } else {
+      alert('Something went wrong. Please try again.')
+    }
+    
     form.processing = false
   }
 }

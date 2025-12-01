@@ -17,95 +17,130 @@ class MemberRegistrationController extends Controller
 {
     public function store(Request $request)
     {
-        $data = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email'],
-            'phone' => ['required', 'string', 'max:20'],
-            'industry' => ['nullable', 'string', 'max:255'],
-            'region' => ['nullable', 'string', 'max:255'],
-            'register_type' => ['required', 'integer', 'in:0,1,-1'],
-            'agree' => ['accepted'],
-        ]);
-
-        $member = User::firstOrCreate(
-            ['email' => $data['email']],
-            [
-                'member_uuid' => Str::uuid(),
-                'name' => $data['name'],
-                'phone' => $data['phone'],
-                'industry' => $data['industry'] ?? null,
-                'region' => $data['region'] ?? null,
-                'register_type' => $data['register_type'],
-                'password' => bcrypt(Str::random(12)),
-            ]
-        );
-
-        if (!$member->wasRecentlyCreated) {
-            $member->update([
-                'register_type' => $data['register_type'],
-                'name' => $data['name'],
-                'phone' => $data['phone'],
-                'industry' => $data['industry'] ?? null,
-                'region' => $data['region'] ?? null,
+        try {
+            $data = $request->validate([
+                'name' => ['required', 'string', 'max:255'],
+                'email' => ['required', 'email'],
+                'phone' => ['required', 'string', 'max:20'],
+                'country_code' => ['required', 'string', 'max:10'],
+                'industry' => ['nullable', 'string', 'max:255'],
+                'region' => ['nullable', 'string', 'max:255'],
+                'register_type' => ['required', 'integer', 'in:0,1,2'],
+                'agree' => ['accepted'],
+            ], [
+                'agree.accepted' => 'You must agree to the Terms & Conditions and Privacy Policy.',
+                'register_type.required' => 'Please select a membership type.',
+                'country_code.required' => 'Country code is required.',
             ]);
-        }
 
-        // Free membership (0) - just save and return
-        if ($data['register_type'] === RegisterType::FREE->value) {
+            // Combine country code with phone number
+            $fullPhone = $data['country_code'] . $data['phone'];
+
+            // Log the data being saved
+            Log::info('Registration data:', [
+                'email' => $data['email'],
+                'phone' => $fullPhone,
+                'register_type' => $data['register_type'],
+            ]);
+
+            $member = User::firstOrCreate(
+                ['email' => $data['email']],
+                [
+                    'member_uuid' => Str::uuid(),
+                    'name' => $data['name'],
+                    'phone' => $fullPhone,
+                    'industry_affiliation' => $data['industry'] ?? null,
+                    'region' => $data['region'] ?? null,
+                    'register_type' => $data['register_type'],
+                    'agreed_to_terms' => true,
+                    'password' => bcrypt(Str::random(12)),
+                ]
+            );
+
+            if (!$member->wasRecentlyCreated) {
+                $member->update([
+                    'register_type' => $data['register_type'],
+                    'name' => $data['name'],
+                    'phone' => $fullPhone,
+                    'industry_affiliation' => $data['industry'] ?? null,
+                    'region' => $data['region'] ?? null,
+                    'agreed_to_terms' => true,
+                ]);
+            }
+
+            // Free membership (0) - just save and return
+            if ((int) $data['register_type'] === 0) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Free membership registered successfully',
+                    'email' => $member->email,
+                ]);
+            }
+
+            // Download membership (1) - just save and return
+            if ((int) $data['register_type'] === 1) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Download membership registered successfully',
+                    'email' => $member->email,
+                ]);
+            }
+
+            // Contribute membership (2) - create transaction and continue with payment
+            $membershipDetails = $this->getMembershipDetails($data['register_type']);
+            $reference = 'MBR_' . strtoupper(Str::random(10));
+
+            Transaction::create([
+                'referenceId' => $reference,
+                'name'        => $member->name,
+                'email'       => $member->email,
+                'amount'      => $membershipDetails['amount'],
+                'status'      => TransactionStatus::PENDING,
+                'remarks'     => [
+                    'type' => 'membership_fee',
+                    'membership' => $membershipDetails['name'],
+                    'register_type' => $data['register_type'],
+                    'gateway' => 'paystack',
+                ],
+            ]);
+
             return response()->json([
-                'success' => true,
-                'message' => 'Free membership registered successfully',
+                'reference' => $reference,
                 'email' => $member->email,
+                'amount' => $membershipDetails['amount'],
+                'membership_name' => $membershipDetails['name'],
             ]);
-        }
 
-        // Download membership (1) - just save and return
-        if ($data['register_type'] === RegisterType::DOWNLOAD->value) {
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            Log::error('Validation error:', ['errors' => $e->errors()]);
+            throw $e;
+        } catch (\Exception $e) {
+            Log::error('Registration error:', [
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
             return response()->json([
-                'success' => true,
-                'message' => 'Download membership registered successfully',
-                'email' => $member->email,
-            ]);
+                'error' => 'Registration failed. Please check the logs.',
+                'message' => $e->getMessage()
+            ], 500);
         }
-
-        // Contribute membership (-1) - create transaction and continue with payment
-        $membershipDetails = $this->getMembershipDetails($data['register_type']);
-        $reference = 'MBR_' . strtoupper(Str::random(10));
-
-        Transaction::create([
-            'referenceId' => $reference,
-            'name'        => $member->name,
-            'email'       => $member->email,
-            'amount'      => $membershipDetails['amount'],
-            'status'      => TransactionStatus::PENDING,
-            'remarks'     => [
-                'type' => 'membership_fee',
-                'membership' => $membershipDetails['name'],
-                'register_type' => $data['register_type'],
-                'gateway' => 'paystack',
-            ],
-        ]);
-
-        return response()->json([
-            'reference' => $reference,
-            'email' => $member->email,
-            'amount' => $membershipDetails['amount'],
-            'membership_name' => $membershipDetails['name'],
-        ]);
     }
 
     private function getMembershipDetails(int $registerType): array
     {
         return match ($registerType) {
-            RegisterType::FREE->value => [
+            0 => [
                 'name' => 'Free Membership',
                 'amount' => 0,
             ],
-            RegisterType::DOWNLOAD->value => [
+            1 => [
                 'name' => 'Download Membership',
                 'amount' => 150,
             ],
-            RegisterType::CONTRIBUTE->value => [
+            2 => [
                 'name' => 'Premier Membership',
                 'amount' => 350,
             ],
