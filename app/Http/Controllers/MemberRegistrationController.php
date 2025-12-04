@@ -6,8 +6,11 @@ use App\Models\User;
 use App\Models\Transaction;
 use App\Models\Enums\TransactionStatus;
 use App\Models\Enums\RegisterType;
+use App\Mail\MemberRegistered;
+use App\Mail\PaymentSuccessful;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Illuminate\Support\Carbon;
@@ -34,10 +37,8 @@ class MemberRegistrationController extends Controller
                 'region.required' => 'Please select your country.',
             ]);
 
-            // Combine country code with phone number
             $fullPhone = $data['country_code'] . $data['phone'];
 
-            // Log the data being saved
             Log::info('Registration data:', [
                 'email' => $data['email'],
                 'phone' => $fullPhone,
@@ -69,7 +70,19 @@ class MemberRegistrationController extends Controller
                 ]);
             }
 
-            // Free membership (0) - just save and return
+            // Send welcome email for all registration types
+            try {
+                Mail::to($member->email)->send(new MemberRegistered($member));
+                Log::info('Welcome email sent', ['email' => $member->email]);
+            } catch (\Exception $e) {
+                Log::error('Failed to send welcome email', [
+                    'email' => $member->email,
+                    'error' => $e->getMessage()
+                ]);
+                // Don't break registration if email fails
+            }
+
+            // Free membership (0)
             if ((int) $data['register_type'] === 0) {
                 return response()->json([
                     'success' => true,
@@ -78,7 +91,7 @@ class MemberRegistrationController extends Controller
                 ]);
             }
 
-            // Download membership (1) - just save and return
+            // Download membership (1)
             if ((int) $data['register_type'] === 1) {
                 return response()->json([
                     'success' => true,
@@ -87,7 +100,7 @@ class MemberRegistrationController extends Controller
                 ]);
             }
 
-            // Contribute membership (2) - create transaction and continue with payment
+            // Premium membership (2) - create transaction
             $membershipDetails = $this->getMembershipDetails($data['register_type']);
             $reference = 'MBR_' . strtoupper(Str::random(10));
 
@@ -194,6 +207,20 @@ class MemberRegistrationController extends Controller
                         'paystack_reference' => $data['reference'],
                     ]),
                 ]);
+
+                // Send payment success email
+                try {
+                    $member = User::where('email', $transaction->email)->first();
+                    if ($member) {
+                        Mail::to($member->email)->send(new PaymentSuccessful($member, $transaction));
+                        Log::info('Payment success email sent', ['email' => $member->email]);
+                    }
+                } catch (\Exception $e) {
+                    Log::error('Failed to send payment success email', [
+                        'email' => $transaction->email,
+                        'error' => $e->getMessage()
+                    ]);
+                }
             }
 
             return Inertia::render('PaymentSuccess', [
@@ -250,6 +277,20 @@ class MemberRegistrationController extends Controller
                         'paystack_data' => $data,
                     ]),
                 ]);
+
+                // Send payment success email via webhook as well
+                try {
+                    $member = User::where('email', $transaction->email)->first();
+                    if ($member) {
+                        Mail::to($member->email)->send(new PaymentSuccessful($member, $transaction));
+                        Log::info('Payment success email sent via webhook', ['email' => $member->email]);
+                    }
+                } catch (\Exception $e) {
+                    Log::error('Failed to send payment success email via webhook', [
+                        'email' => $transaction->email,
+                        'error' => $e->getMessage()
+                    ]);
+                }
             }
         }
 
