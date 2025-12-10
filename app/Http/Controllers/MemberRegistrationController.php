@@ -26,7 +26,7 @@ class MemberRegistrationController extends Controller
                 'email' => ['required', 'email'],
                 'phone' => ['required', 'string', 'max:20'],
                 'country_code' => ['required', 'string', 'max:10'],
-                'industry' => ['nullable', 'string', 'max:255'],
+                'industry' => ['required', 'string', 'max:255'],
                 'region' => ['required', 'string', 'max:255'],
                 'register_type' => ['required', 'integer', 'in:0,1,2'],
                 'agree' => ['accepted'],
@@ -35,6 +35,7 @@ class MemberRegistrationController extends Controller
                 'register_type.required' => 'Please select a membership type.',
                 'country_code.required' => 'Country code is required.',
                 'region.required' => 'Please select your country.',
+                'industry.required' => 'Industry affiliation is required.',
             ]);
 
             $fullPhone = $data['country_code'] . $data['phone'];
@@ -51,7 +52,7 @@ class MemberRegistrationController extends Controller
                     'member_uuid' => Str::uuid(),
                     'name' => $data['name'],
                     'phone' => $fullPhone,
-                    'industry_affiliation' => $data['industry'] ?? null,
+                    'industry_affiliation' => $data['industry'],
                     'region' => $data['region'],
                     'register_type' => $data['register_type'],
                     'agreed_to_terms' => true,
@@ -64,7 +65,7 @@ class MemberRegistrationController extends Controller
                     'register_type' => $data['register_type'],
                     'name' => $data['name'],
                     'phone' => $fullPhone,
-                    'industry_affiliation' => $data['industry'] ?? null,
+                    'industry_affiliation' => $data['industry'],
                     'region' => $data['region'],
                     'agreed_to_terms' => true,
                 ]);

@@ -114,20 +114,24 @@
         </div>
 
         <div class="grid grid-cols-2 gap-4">
-          <!-- Industry Affiliation -->
+          <!-- Industry Affiliation - NOW REQUIRED -->
           <div>
-            <label class="block text-sm font-semibold text-gray-900 mb-2">Industry Affiliation</label>
+            <label class="block text-sm font-semibold text-gray-900 mb-2">
+              Industry Affiliation <span class="text-red-600">*</span>
+            </label>
             <div class="relative">
               <input
                 v-model="form.industry"
                 type="text"
                 placeholder="Industry Affiliation"
                 class="w-full rounded-lg border-0 bg-white shadow-sm py-3 px-4 pr-10 text-gray-900 placeholder:text-gray-400 focus:ring-2 focus:ring-[#FFDA9E]"
+                required
               />
               <span class="absolute inset-y-0 right-3 flex items-center text-gray-900">
                 <i class="fa fa-briefcase"></i>
               </span>
             </div>
+            <p v-if="form.errors.industry" class="text-red-600 text-sm mt-1">{{ form.errors.industry }}</p>
           </div>
 
           <!-- Country Searchable Dropdown -->
@@ -529,6 +533,8 @@ async function submit() {
       // Show specific error for terms if that's the issue
       if (errors.agree) {
         alert('⚠️ You must agree to the Terms & Conditions and Privacy Policy')
+      } else if (errors.industry) {
+        alert('⚠️ Industry affiliation is required')
       } else {
         alert('⚠️ Please check the form for errors and try again.')
       }
