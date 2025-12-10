@@ -72,16 +72,16 @@ class MemberRegistrationController extends Controller
             }
 
             // Send welcome email for all registration types
-            try {
-                Mail::to($member->email)->send(new MemberRegistered($member));
-                Log::info('Welcome email sent', ['email' => $member->email]);
-            } catch (\Exception $e) {
-                Log::error('Failed to send welcome email', [
-                    'email' => $member->email,
-                    'error' => $e->getMessage()
-                ]);
-                // Don't break registration if email fails
-            }
+            // try {
+            //     Mail::to($member->email)->send(new MemberRegistered($member));
+            //     Log::info('Welcome email sent', ['email' => $member->email]);
+            // } catch (\Exception $e) {
+            //     Log::error('Failed to send welcome email', [
+            //         'email' => $member->email,
+            //         'error' => $e->getMessage()
+            //     ]);
+            //     // Don't break registration if email fails
+            // }
 
             // Free membership (0)
             if ((int) $data['register_type'] === 0) {
